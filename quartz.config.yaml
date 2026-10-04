@@ -130,7 +130,7 @@ plugins:
       unlistWhenEncrypted: false
       outputPath: static/encryptedContentIndex.json
   - source: "@quartz-community/stacked-pages"
-    enabled: false
+    enabled: true
     layout:
       position: afterBody
       priority: 50
@@ -161,7 +161,8 @@ plugins:
     layout:
       position: left
       priority: 50
-  - source: "@quartz-community/graph"
+  # Local wrapper (plugins/graph) fixing invisible edges/labels and adding a collapsible header
+  - source: ./plugins/graph
     enabled: true
     layout:
       position: right
@@ -285,11 +286,7 @@ layout:
         left: []
         right: []
     content: {}
-    folder:
-      exclude:
-        - reader-mode
-      positions:
-        right: []
+    folder: {}
     tag:
       exclude:
         - reader-mode

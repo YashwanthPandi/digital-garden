@@ -1,0 +1,74 @@
+{
+  "name": "graph",
+  "version": "1.0.0-local",
+  "private": true,
+  "description": "Local wrapper around @quartz-community/graph: visible edges, hover labels and a collapsible header.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "quartz": {
+    "name": "graph",
+    "displayName": "Graph (local)",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "localGraph": {
+        "drag": true,
+        "zoom": true,
+        "depth": 1,
+        "scale": 1.1,
+        "repelForce": 0.5,
+        "centerForce": 0.3,
+        "linkDistance": 30,
+        "fontSize": 0.6,
+        "opacityScale": 1,
+        "showTags": true,
+        "removeTags": [],
+        "focusOnHover": false,
+        "enableRadial": false
+      },
+      "globalGraph": {
+        "drag": true,
+        "zoom": true,
+        "depth": -1,
+        "scale": 0.9,
+        "repelForce": 0.5,
+        "centerForce": 0.2,
+        "linkDistance": 30,
+        "fontSize": 0.6,
+        "opacityScale": 1,
+        "showTags": true,
+        "removeTags": [],
+        "focusOnHover": true,
+        "enableRadial": true
+      }
+    },
+    "components": {
+      "Graph": {
+        "displayName": "Graph",
+        "defaultPosition": "right",
+        "defaultPriority": 10
+      }
+    },
+    "optionSchema": {
+      "localGraph": {
+        "type": "object"
+      },
+      "globalGraph": {
+        "type": "object"
+      }
+    }
+  }
+}

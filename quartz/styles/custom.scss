@@ -1,3 +1,14 @@
 @use "./variables.scss" as *;
 
 // put your custom CSS here!
+
+// Stacked pages: make room for the binder tab strips so they don't cover the sidebars.
+// The plugin's own padding rule loses to the theme's .page styles.
+body.has-binder-left .page {
+  box-sizing: border-box;
+  padding-left: 40px !important;
+}
+body.has-binder-right .page {
+  box-sizing: border-box;
+  padding-right: 40px !important;
+}
