@@ -1,0 +1,35 @@
+{
+  "name": "reading-tools",
+  "version": "1.0.0-local",
+  "private": true,
+  "description": "Sidebar toggles and a Kindle-style reader mode for Quartz.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "quartz": {
+    "name": "reading-tools",
+    "displayName": "Reading Tools (local)",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {},
+    "components": {
+      "ReadingTools": {
+        "displayName": "Reading Tools",
+        "defaultPosition": "left",
+        "defaultPriority": 35
+      }
+    }
+  }
+}

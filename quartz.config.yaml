@@ -206,7 +206,10 @@ plugins:
       position: left
       priority: 30
       group: toolbar
+  # Replaced by ./plugins/reading-tools (sidebar toggles + Kindle-style reader)
   - source: "@quartz-community/reader-mode"
+    enabled: false
+  - source: ./plugins/reading-tools
     enabled: true
     layout:
       position: left
@@ -258,7 +261,7 @@ plugins:
         - tags
         - aliases
       excludedProperties: []
-      hidePropertiesView: false
+      hidePropertiesView: true
       delimiters: ---
       language: yaml
     order: 5
@@ -288,8 +291,6 @@ layout:
     content: {}
     folder: {}
     tag:
-      exclude:
-        - reader-mode
       positions:
         right: []
     canvas: {}
