@@ -1,9 +1,13 @@
 ---
-title: TypeScript
+title: TypeScript Notebook
 tags:
   - TypeScript
+  - Notes
   - Revision
+  - Skills
 ---
+
+My TypeScript study notes, split by concept. Angular is built on these, see [[Angular Notebook/index|Angular Notebook]].
 
 | Beginner                   | Intermediate           | Advanced / Expert                   |
 | -------------------------- | ---------------------- | ----------------------------------- |
@@ -23,5 +27,12 @@ tags:
 - [[Arrays, Tuples and Sets]]
 - [[Objects and Interfaces]]
 - [[Functions]]
+- [[TypeScript Notebook/OOP in TypeScript/index|OOP in TypeScript]]: classes, constructors, inheritance, encapsulation, abstraction
 
-Next: [[Angular Notebook/OOP in TypeScript/index|OOP in TypeScript]]
+## Software and extensions
+
+- VS Code
+- Node JS
+- Code Runner (extension)
+- ESLint (suggestions extension)
+- Prettier (formatting in order)

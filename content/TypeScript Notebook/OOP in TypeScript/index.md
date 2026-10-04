@@ -24,4 +24,4 @@ A paradigm built around **objects & methods**. Objects = data structures that bu
 - [[Encapsulation and Abstraction]]
 - [[Exception Handling]]
 
-Next: [[Angular Notebook/Angular Basics/index|Angular Basics]]
+Back to [[TypeScript Notebook/index|TypeScript Notebook]]

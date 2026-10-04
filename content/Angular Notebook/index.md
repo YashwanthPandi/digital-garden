@@ -1,19 +1,27 @@
 ---
 title: Angular Notebook
 tags:
+  - Angular
   - Notes
   - Revision
   - Skills
 ---
 
-My Angular + TypeScript study notes, split by concept.
+My Angular study notes, split by concept. For the language itself, see [[TypeScript Notebook/index|TypeScript Notebook]].
 
-## Sections
+_Topic cover: Introduction_
 
-1. [[Angular Notebook/TypeScript/index|TypeScript]]: the language Angular is written in
-2. [[Angular Notebook/OOP in TypeScript/index|OOP in TypeScript]]: classes, inheritance, encapsulation, abstraction
-3. [[Angular Notebook/Angular Basics/index|Angular Basics]]: architecture, decorators, directives, services, routing
-4. [[Learning Roadmap]]: the full level-by-level plan
+## Concepts
+
+- [[Architecture]]
+- [[Decorators]]
+- [[Data Binding]]
+- [[Directives]]
+- [[Pipes]]
+- [[Component Communication]]
+- [[Services and Dependency Injection]]
+- [[Routing]]
+- [[Learning Roadmap]]: the full level-by-level plan
 
 ## Topics covered
 
@@ -27,15 +35,11 @@ My Angular + TypeScript study notes, split by concept.
 - Services – Dependency Injection
 - Forms → Reactive forms, Template driven, Typed forms, Dynamic forms
 
-## Software and extensions
-
-- VS Code
-- Node JS
-- Code Runner (extension)
-- ESLint (suggestions extension)
-- Prettier (formatting in order)
-
 ## To revise
 
 - `@Input`, `@Output` (concepts + implementation): [[Component Communication]]
 - Dependency injection: [[Services and Dependency Injection]]
+
+---
+
+_Pages 94–105 not yet transcribed._
