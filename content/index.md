@@ -16,13 +16,48 @@ A growing collection of notes and ideas I write while learning. Nothing here is 
 
 ## 📚 Notebooks
 
-| Notebook | Focus | Status |
-| --- | --- | --- |
-| [[HTML5 Notebook/index\|HTML5 Notebook]] | Structure, semantics, forms, media, accessibility, SEO | 🌱 Seedling |
-| [[CSS3 Notebook/index\|CSS3 Notebook]] | Selectors, box model, Flexbox, Grid, responsive design, animations | 🌱 Seedling |
-| [[JavaScript Notebook/index\|JavaScript Notebook]] | Core language, DOM, events, closures, async, fetch | 🌱 Seedling |
-| [[Angular Notebook/index\|Angular Notebook]] | Components, templates, services, DI, routing, RxJS | 🌿 Growing |
-| [[TypeScript Notebook/index\|TypeScript Notebook]] | Types, generics, classes, and OOP principles | 🌿 Growing |
+<div class="bookshelf">
+  <a class="book book-html internal" href="./html5-notebook/">
+    <span class="book-cover">
+      <span class="book-title">HTML5</span>
+      <span class="book-subtitle">Notebook</span>
+      <span class="book-focus">Structure, semantics, forms, media, accessibility, SEO</span>
+      <span class="book-meta">11 chapters · 🌱 Seedling</span>
+    </span>
+  </a>
+  <a class="book book-css internal" href="./css3-notebook/">
+    <span class="book-cover">
+      <span class="book-title">CSS3</span>
+      <span class="book-subtitle">Notebook</span>
+      <span class="book-focus">Selectors, box model, Flexbox, Grid, responsive design, animations</span>
+      <span class="book-meta">11 chapters · 🌱 Seedling</span>
+    </span>
+  </a>
+  <a class="book book-js internal" href="./javascript-notebook/">
+    <span class="book-cover">
+      <span class="book-title">JavaScript</span>
+      <span class="book-subtitle">Notebook</span>
+      <span class="book-focus">Core language, DOM, events, closures, async, fetch</span>
+      <span class="book-meta">19 chapters · 🌱 Seedling</span>
+    </span>
+  </a>
+  <a class="book book-ts internal" href="./typescript-notebook/">
+    <span class="book-cover">
+      <span class="book-title">TypeScript</span>
+      <span class="book-subtitle">Notebook</span>
+      <span class="book-focus">Types, generics, classes, and OOP principles</span>
+      <span class="book-meta">18 chapters · 🌿 Growing</span>
+    </span>
+  </a>
+  <a class="book book-ng internal" href="./angular-notebook/">
+    <span class="book-cover">
+      <span class="book-title">Angular</span>
+      <span class="book-subtitle">Notebook</span>
+      <span class="book-focus">Components, templates, services, DI, routing, RxJS</span>
+      <span class="book-meta">33 chapters · 🌿 Growing</span>
+    </span>
+  </a>
+</div>
 
 **Status legend:** 🌱 Seedling (rough draft) · 🌿 Growing (in progress) · 🌳 Evergreen (reviewed and solid)
 
