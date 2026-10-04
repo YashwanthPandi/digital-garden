@@ -1,11 +1,16 @@
-// Reading tools: toolbar buttons to hide the left/right sidebars, plus a
+// Reading tools: toolbar buttons to hide the left/right sidebars, a
 // Kindle-style reader mode (distraction-free column, reading themes, font,
-// size, spacing and width settings, progress and time left).
+// size, spacing and width settings, progress and time left), a site settings
+// panel saved in the browser (appearance, text, code blocks, layout), and
+// GitHub-style code block styling.
 //
 // State lives on <html> as data attributes so it survives SPA navigation:
 //   data-hide-left, data-hide-right, data-reader, data-reader-theme,
 //   data-reader-font, data-reader-spacing, data-reader-width, data-reader-justify
-// and --reader-size. Preferences are saved in localStorage under "reading-tools".
+// and --reader-size. Site settings add data-site-size, data-site-font,
+// data-site-spacing, data-code-wrap, data-code-lines and data-code-size.
+// Preferences are saved in localStorage under "reading-tools"; light/dark uses
+// the darkmode plugin's own "theme" key (no key = follow the system).
 //
 // Quartz wraps component CSS in @layer, which loses to the theme's unlayered
 // rules, so the stylesheet is injected as a plain <style id="rt-style"> instead.
@@ -40,6 +45,16 @@ const ICONS = {
       [
         jsx("rect", { x: 3, y: 4, width: 18, height: 16, rx: 2 }),
         jsx("line", { x1: 15, y1: 4, x2: 15, y2: 20 }),
+      ],
+      label,
+    ),
+  settings: (label) =>
+    svg(
+      [
+        jsx("circle", { cx: 12, cy: 12, r: 3 }),
+        jsx("path", {
+          d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z",
+        }),
       ],
       label,
     ),
@@ -102,6 +117,20 @@ function beforeDOM(css) {
     h.setAttribute("data-reader-width", s.width || "medium")
     if (s.justify === true) h.setAttribute("data-reader-justify", "")
     h.style.setProperty("--reader-size", (s.size || 19) + "px")
+    if (s.siteSize && s.siteSize !== "m") h.setAttribute("data-site-size", s.siteSize)
+    if (s.siteFont === "serif") h.setAttribute("data-site-font", "serif")
+    if (s.siteSpacing && s.siteSpacing !== "normal") h.setAttribute("data-site-spacing", s.siteSpacing)
+    if (s.codeWrap) h.setAttribute("data-code-wrap", "")
+    if (s.codeLines === false) h.setAttribute("data-code-lines", "off")
+    if (s.codeSize && s.codeSize !== "m") h.setAttribute("data-code-size", s.codeSize)
+    if (s.appearance === "system") {
+      // follow the OS: clear the darkmode plugin's explicit choice
+      localStorage.removeItem("theme")
+      h.setAttribute(
+        "saved-theme",
+        window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+      )
+    }
   } catch (e) {}
 }
 
@@ -151,6 +180,7 @@ function afterDOM(css) {
     patch[side === "left" ? "hideLeft" : "hideRight"] = on
     save(patch)
     syncButtons()
+    if (typeof applySite === "function") applySite()
   }
 
   // ---- reader ------------------------------------------------------------
@@ -165,6 +195,7 @@ function afterDOM(css) {
     document.head.appendChild(l)
   }
   function setReader(on) {
+    closeSettings()
     if (on) {
       loadFont()
       h.setAttribute("data-reader", "on")
@@ -278,6 +309,9 @@ function afterDOM(css) {
       f.innerHTML =
         '<button type="button" class="rt-float-btn rt-float-left" data-rt-action="left" title="Show left sidebar ([)" aria-label="Show left sidebar">' +
         '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><line x1="9" y1="4" x2="9" y2="20"></line></svg></button>' +
+        // the toolbar gear lives in the left sidebar, so keep settings reachable when it is hidden
+        '<button type="button" class="rt-float-btn rt-float-settings" data-rt-action="settings" title="Settings (,)" aria-label="Settings">' +
+        '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg></button>' +
         '<button type="button" class="rt-float-btn rt-float-right" data-rt-action="right" title="Show right sidebar (])" aria-label="Show right sidebar">' +
         '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><line x1="15" y1="4" x2="15" y2="20"></line></svg></button>'
       document.body.appendChild(f)
@@ -342,13 +376,254 @@ function afterDOM(css) {
       var on =
         a === "reader"
           ? h.hasAttribute("data-reader")
-          : h.hasAttribute("data-hide-" + a)
+          : a === "settings"
+            ? settingsOpen()
+            : h.hasAttribute("data-hide-" + a)
       b.setAttribute("aria-pressed", on ? "true" : "false")
     })
   }
 
+  // ---- site settings ------------------------------------------------------
+  function siteState() {
+    var s = load()
+    var theme = null
+    try {
+      theme = localStorage.getItem("theme")
+    } catch (e) {}
+    var graphCollapsed = false
+    try {
+      graphCollapsed = localStorage.getItem("graph-collapsed") === "true"
+    } catch (e) {}
+    return {
+      appearance: s.appearance === "system" || !theme ? "system" : theme,
+      siteSize: s.siteSize || "m",
+      siteFont: s.siteFont || "sans",
+      siteSpacing: s.siteSpacing || "normal",
+      codeWrap: s.codeWrap ? "on" : "off",
+      codeLines: s.codeLines === false ? "off" : "on",
+      codeSize: s.codeSize || "m",
+      left: h.hasAttribute("data-hide-left") ? "hide" : "show",
+      right: h.hasAttribute("data-hide-right") ? "hide" : "show",
+      graph: graphCollapsed ? "collapsed" : "expanded",
+    }
+  }
+  function systemTheme() {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+  }
+  function setTheme(t) {
+    h.setAttribute("saved-theme", t)
+    if (document.body) {
+      document.body.classList.remove("theme-dark", "theme-light")
+      document.body.classList.add("theme-" + t)
+    }
+    document.dispatchEvent(new CustomEvent("themechange", { detail: { theme: t } }))
+  }
+  function setAppearance(v) {
+    try {
+      if (v === "system") localStorage.removeItem("theme")
+      else localStorage.setItem("theme", v)
+    } catch (e) {}
+    save({ appearance: v === "system" ? "system" : undefined })
+    setTheme(v === "system" ? systemTheme() : v)
+  }
+  function setGraph(collapsed) {
+    try {
+      localStorage.setItem("graph-collapsed", String(collapsed))
+    } catch (e) {}
+    document.querySelectorAll(".graph").forEach(function (g) {
+      g.classList.toggle("collapsed", collapsed)
+      var b = g.querySelector(".graph-header")
+      if (b) b.setAttribute("aria-expanded", collapsed ? "false" : "true")
+    })
+  }
+  function applySite() {
+    var s = load()
+    s.siteSize && s.siteSize !== "m"
+      ? h.setAttribute("data-site-size", s.siteSize)
+      : h.removeAttribute("data-site-size")
+    if (s.siteFont === "serif") {
+      loadFont()
+      h.setAttribute("data-site-font", "serif")
+    } else h.removeAttribute("data-site-font")
+    s.siteSpacing && s.siteSpacing !== "normal"
+      ? h.setAttribute("data-site-spacing", s.siteSpacing)
+      : h.removeAttribute("data-site-spacing")
+    flag("data-code-wrap", !!s.codeWrap)
+    s.codeLines === false ? h.setAttribute("data-code-lines", "off") : h.removeAttribute("data-code-lines")
+    s.codeSize && s.codeSize !== "m"
+      ? h.setAttribute("data-code-size", s.codeSize)
+      : h.removeAttribute("data-code-size")
+    var panel = document.getElementById("rt-settings")
+    if (!panel) return
+    var st = siteState()
+    panel.querySelectorAll("[data-rt-site]").forEach(function (b) {
+      var k = b.getAttribute("data-rt-site")
+      b.setAttribute("aria-pressed", st[k] === b.getAttribute("data-rt-value") ? "true" : "false")
+    })
+  }
+  function setSite(k, v) {
+    switch (k) {
+      case "appearance":
+        setAppearance(v)
+        break
+      case "left":
+      case "right":
+        if ((v === "hide") !== h.hasAttribute("data-hide-" + k)) toggleSide(k)
+        break
+      case "graph":
+        setGraph(v === "collapsed")
+        break
+      case "codeWrap":
+        save({ codeWrap: v === "on" })
+        break
+      case "codeLines":
+        save({ codeLines: v === "on" })
+        break
+      default:
+        var patch = {}
+        patch[k] = v
+        save(patch)
+    }
+    applySite()
+  }
+  function siteChoice(key, value, label) {
+    return (
+      '<button type="button" class="rt-choice" data-rt-site="' +
+      key +
+      '" data-rt-value="' +
+      value +
+      '">' +
+      label +
+      "</button>"
+    )
+  }
+  function siteRow(label, key, options) {
+    return (
+      '<div class="rt-row"><span class="rt-label">' +
+      label +
+      '</span><div class="rt-group">' +
+      options
+        .map(function (o) {
+          return siteChoice(key, o[0], o[1])
+        })
+        .join("") +
+      "</div></div>"
+    )
+  }
+  // Modal: #rt-settings is the backdrop, .rt-modal the dialog box inside it.
+  function buildSettingsUI() {
+    if (document.getElementById("rt-settings")) return
+    var p = el("div", { id: "rt-settings" })
+    p.innerHTML =
+      '<div class="rt-modal" role="dialog" aria-modal="true" aria-labelledby="rt-settings-title" tabindex="-1">' +
+      '<div class="rt-settings-head"><strong id="rt-settings-title">Settings</strong>' +
+      '<button type="button" class="rt-bar-btn rt-close" data-rt-action="settings-close" aria-label="Close settings (Esc)" title="Close (Esc)">✕</button></div>' +
+      '<div class="rt-modal-body">' +
+      '<div class="rt-section">Appearance</div>' +
+      siteRow("Theme", "appearance", [["light", "Light"], ["dark", "Dark"], ["system", "System"]]) +
+      siteRow("Text size", "siteSize", [["s", "S"], ["m", "M"], ["l", "L"], ["xl", "XL"]]) +
+      siteRow("Font", "siteFont", [["sans", "Sans"], ["serif", '<span style="font-family:Literata,Georgia,serif">Serif</span>']]) +
+      siteRow("Line spacing", "siteSpacing", [["compact", "Compact"], ["normal", "Normal"], ["relaxed", "Relaxed"]]) +
+      '<div class="rt-section">Code</div>' +
+      siteRow("Wrap long lines", "codeWrap", [["off", "Off"], ["on", "On"]]) +
+      siteRow("Line numbers", "codeLines", [["off", "Off"], ["on", "On"]]) +
+      siteRow("Code size", "codeSize", [["s", "S"], ["m", "M"], ["l", "L"]]) +
+      '<div class="rt-section">Layout</div>' +
+      siteRow("Left sidebar", "left", [["show", "Show"], ["hide", "Hide"]]) +
+      siteRow("Right sidebar", "right", [["show", "Show"], ["hide", "Hide"]]) +
+      siteRow("Graph view", "graph", [["expanded", "Open"], ["collapsed", "Collapsed"]]) +
+      '<div class="rt-settings-foot">' +
+      '<button type="button" class="rt-choice" data-rt-action="reader">Open reader mode</button>' +
+      '<button type="button" class="rt-choice rt-reset" data-rt-action="reset">Reset all</button></div>' +
+      '<p class="rt-note">Saved in this browser only.</p>' +
+      "</div></div>"
+    document.body.appendChild(p)
+    applySite()
+  }
+  function settingsOpen() {
+    var p = document.getElementById("rt-settings")
+    return !!(p && p.classList.contains("open"))
+  }
+  var lastFocus = null
+  function openSettings() {
+    buildSettingsUI()
+    var p = document.getElementById("rt-settings")
+    applySite()
+    lastFocus = document.activeElement
+    p.classList.add("open")
+    h.setAttribute("data-rt-modal", "")
+    var m = p.querySelector(".rt-modal")
+    if (m) m.focus({ preventScroll: true })
+    syncButtons()
+  }
+  function closeSettings() {
+    var p = document.getElementById("rt-settings")
+    var wasOpen = !!(p && p.classList.contains("open"))
+    if (p) p.classList.remove("open")
+    h.removeAttribute("data-rt-modal")
+    syncButtons()
+    if (wasOpen && lastFocus && document.contains(lastFocus) && lastFocus.offsetParent) {
+      lastFocus.focus({ preventScroll: true })
+    }
+    lastFocus = null
+  }
+  // keep Tab inside the modal while it is open
+  function trapFocus(e) {
+    var m = document.querySelector("#rt-settings .rt-modal")
+    if (!m) return
+    var items = Array.prototype.filter.call(m.querySelectorAll("button"), function (b) {
+      return b.offsetParent !== null
+    })
+    if (!items.length) return
+    var first = items[0]
+    var last = items[items.length - 1]
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === m)) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }
+  function resetAll() {
+    try {
+      localStorage.removeItem(KEY)
+      localStorage.removeItem("theme")
+      localStorage.removeItem("graph-collapsed")
+    } catch (e) {}
+    location.reload()
+  }
+  // keep "System" sticky when the OS theme changes (darkmode plugin would save it)
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+    if (load().appearance === "system") {
+      setTimeout(function () {
+        try {
+          localStorage.removeItem("theme")
+        } catch (e) {}
+        applySite()
+      }, 0)
+    }
+  })
+
   // ---- events (bound once; delegated so they survive SPA re-renders) --------
   document.addEventListener("click", function (e) {
+    // the darkmode toggle sets an explicit theme, so leave "System"
+    if (e.target.closest(".darkmode")) {
+      save({ appearance: undefined })
+      setTimeout(applySite, 0)
+    }
+    var site = e.target.closest("[data-rt-site]")
+    if (site) {
+      setSite(site.getAttribute("data-rt-site"), site.getAttribute("data-rt-value"))
+      return
+    }
+    var act = e.target.closest("[data-rt-action]")
+    var a = act && act.getAttribute("data-rt-action")
+    if (a === "settings") return settingsOpen() ? closeSettings() : openSettings()
+    if (a === "settings-close") return closeSettings()
+    if (a === "reset") return resetAll()
+    // click on the backdrop closes the modal and goes no further
+    if (settingsOpen() && !e.target.closest("#rt-settings .rt-modal")) return closeSettings()
     var t = e.target.closest("[data-rt-action], [data-rt-set]")
     if (!t) {
       if (h.hasAttribute("data-reader")) {
@@ -391,11 +666,21 @@ function afterDOM(css) {
   })
 
   document.addEventListener("keydown", function (e) {
+    if (settingsOpen()) {
+      // the modal owns the keyboard: only Esc, "," and Tab do anything
+      if (e.key === "Escape" || (e.key === "," && !e.metaKey && !e.ctrlKey && !e.altKey)) {
+        e.preventDefault()
+        closeSettings()
+      } else if (e.key === "Tab") trapFocus(e)
+      return
+    }
     var tag = (e.target && e.target.tagName) || ""
     if (/INPUT|TEXTAREA|SELECT/.test(tag) || (e.target && e.target.isContentEditable)) return
     if (e.metaKey || e.ctrlKey || e.altKey) return
     var reading = h.hasAttribute("data-reader")
-    if (e.key === "Escape" && reading) {
+    if (e.key === "," && !reading) {
+      openSettings()
+    } else if (e.key === "Escape" && reading) {
       if (panelOpen()) closePanel()
       else setReader(false)
     } else if (e.key === "r" || e.key === "R") {
@@ -428,6 +713,8 @@ function afterDOM(css) {
 
   function setup() {
     ensureStyle(css)
+    closeSettings()
+    applySite()
     buildReaderUI()
     syncButtons()
     countWords()
@@ -493,8 +780,10 @@ const CSS = `
   }
   .rt-float-btn:hover { color: var(--secondary); }
   .rt-float-left { left: 1rem; }
+  .rt-float-settings { left: calc(1rem + 42px); }
   .rt-float-right { right: 1rem; }
-  html[data-hide-left]:not([data-reader]) .rt-float-left { display: inline-flex; }
+  html[data-hide-left]:not([data-reader]) :is(.rt-float-left, .rt-float-settings) { display: inline-flex; }
+  body.has-binder-left .rt-float-settings { left: calc(40px + 1rem + 42px); }
   html[data-hide-right]:not([data-reader]) .rt-float-right { display: inline-flex; }
   body.has-binder-left .rt-float-left { left: calc(40px + 1rem); }
 }
@@ -656,8 +945,153 @@ html[data-reader] #rt-bottombar {
   html[data-reader] .page > #quartz-body .center { padding: 4.5rem 1.1rem 5rem; }
   html[data-reader] .center .article-title { font-size: 1.6em; }
 }
+/* ---------- settings modal ---------- */
+/* #rt-settings is the full-screen backdrop; .rt-modal is the centred dialog */
+#rt-settings {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  box-sizing: border-box; background: rgba(0,0,0,0.45);
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  opacity: 0; visibility: hidden; transition: opacity 0.18s, visibility 0.18s;
+}
+#rt-settings.open { opacity: 1; visibility: visible; }
+html[data-rt-modal], html[data-rt-modal] body { overflow: hidden !important; }
+#rt-settings .rt-modal {
+  display: flex; flex-direction: column;
+  width: min(460px, 100%); max-height: min(720px, calc(100vh - 2rem)); max-height: min(720px, calc(100dvh - 2rem));
+  box-sizing: border-box; overflow: hidden;
+  background: var(--light); color: var(--darkgray);
+  border: 1px solid var(--lightgray); border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 0.9rem; line-height: 1.3;
+  text-align: left; transform: translateY(8px) scale(0.98); transition: transform 0.18s ease;
+}
+#rt-settings.open .rt-modal { transform: none; }
+#rt-settings .rt-modal:focus { outline: none; }
+html[saved-theme="dark"] #rt-settings { background: rgba(0,0,0,0.6); }
+html[saved-theme="dark"] #rt-settings .rt-modal { box-shadow: 0 24px 60px rgba(0,0,0,0.7); }
+.rt-settings-head {
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem; border-bottom: 1px solid var(--lightgray); font-size: 1.05rem;
+}
+.rt-settings-head strong { color: var(--dark); }
+#rt-settings .rt-close { width: 32px; height: 32px; padding: 0; justify-content: center; font-size: 1rem; }
+.rt-modal-body { overflow-y: auto; overscroll-behavior: contain; padding: 0.25rem 1.25rem 1rem; }
+.rt-section {
+  margin-top: 1rem; padding-bottom: 0.2rem; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--secondary);
+}
+#rt-settings .rt-row { padding: 0.45rem 0; margin: 0; }
+#rt-settings .rt-row + .rt-row { border-top: 1px solid var(--lightgray); }
+#rt-settings .rt-label { color: var(--darkgray); }
+#rt-settings .rt-choice {
+  margin: 0; padding: 0.3rem 0.65rem; font-size: 0.84rem; min-height: 30px;
+  background: transparent; color: var(--darkgray);
+}
+#rt-settings .rt-choice[aria-pressed="true"] {
+  color: var(--secondary); background: color-mix(in srgb, var(--secondary) 14%, transparent);
+}
+#rt-settings button:focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
+.rt-settings-foot {
+  display: flex; gap: 0.5rem; justify-content: space-between; margin-top: 1rem;
+  padding-top: 0.85rem; border-top: 1px solid var(--lightgray);
+}
+.rt-settings-foot .rt-reset:hover { border-color: #d64545 !important; color: #d64545 !important; }
+.rt-note { margin: 0.6rem 0 0; color: var(--gray); font-size: 0.75rem; text-align: center; }
+@media (max-width: 600px) {
+  /* bottom sheet on phones */
+  #rt-settings { align-items: flex-end; padding: 0; }
+  #rt-settings .rt-modal {
+    width: 100%; max-height: 85vh; max-height: 85dvh;
+    border-radius: 16px 16px 0 0; border-bottom: 0; transform: translateY(24px);
+  }
+  #rt-settings .rt-row { flex-wrap: wrap; }
+  .rt-modal-body { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 800px) {
+  /* sidebar toggles only apply on tablet/desktop */
+  #rt-settings .rt-row:has([data-rt-site="left"]),
+  #rt-settings .rt-row:has([data-rt-site="right"]) { display: none; }
+}
+
+/* ---------- site text settings (normal view, not reader) ---------- */
+html[data-site-size="s"]  { --rt-site-size: 15px; }
+html[data-site-size="l"]  { --rt-site-size: 18.5px; }
+html[data-site-size="xl"] { --rt-site-size: 20.5px; }
+html[data-site-size]:not([data-reader]) .center article { font-size: var(--rt-site-size) !important; }
+html[data-site-size]:not([data-reader]) .center article :is(p, li, td, th, blockquote, dd, dt) { font-size: inherit !important; }
+html[data-site-font="serif"]:not([data-reader]) .center :is(article, .article-title),
+html[data-site-font="serif"]:not([data-reader]) .center article :is(p, li, td, th, blockquote, dd, dt, h1, h2, h3, h4, h5, h6, strong, em, a) {
+  font-family: "Literata", Georgia, "Iowan Old Style", "Palatino Linotype", serif !important;
+}
+html[data-site-spacing="compact"]:not([data-reader]) .center article :is(p, li) { line-height: 1.45 !important; }
+html[data-site-spacing="relaxed"]:not([data-reader]) .center article :is(p, li) { line-height: 1.95 !important; }
+
+/* ---------- code blocks (GitHub-style, both themes) ---------- */
+:root { --rt-code-bg: #f6f8fa; --rt-code-border: #d0d7de; --rt-code-muted: #8c959f; }
+html[saved-theme="dark"] { --rt-code-bg: #161b22; --rt-code-border: #30363d; --rt-code-muted: #6e7681; }
+html[data-code-size="s"] { --rt-code-size: 0.78rem; }
+html[data-code-size="l"] { --rt-code-size: 0.95rem; }
+.center article figure[data-rehype-pretty-code-figure] { margin: 1.1rem 0 !important; }
+.center article pre {
+  position: relative !important;
+  background: var(--rt-code-bg) !important;
+  border: 1px solid var(--rt-code-border) !important;
+  border-radius: 8px !important;
+  padding: 0 !important; margin: 0 !important; overflow: hidden !important;
+}
+.center article pre > code {
+  padding: 0.85rem 0 !important; margin: 0 !important;
+  background: transparent !important; border: 0 !important; border-radius: 0 !important;
+  font-size: var(--rt-code-size, 0.85rem) !important; line-height: 1.65 !important;
+  overflow-x: auto !important;
+}
+.center article pre > code > [data-line] {
+  padding: 0 1rem !important; background: transparent !important; border-left: 0 !important;
+}
+.center article pre > code > [data-line]::before { color: var(--rt-code-muted) !important; }
+.center article pre > code > [data-line][data-highlighted-line] {
+  background: var(--highlight) !important; box-shadow: inset 3px 0 0 var(--secondary);
+}
+html[data-code-lines="off"] .center article pre > code > [data-line]::before { display: none !important; }
+html[data-code-wrap] .center article pre > code {
+  grid-template-columns: minmax(0, 1fr); white-space: pre-wrap !important;
+  overflow-wrap: anywhere; overflow-x: hidden !important;
+}
+html[data-code-wrap] .center article pre > code > [data-line] { white-space: pre-wrap !important; }
+/* language label, hidden while the copy button shows */
+.center article pre[data-language]::before {
+  content: attr(data-language); position: absolute; top: 0.5rem; right: 0.8rem; z-index: 1;
+  font: 600 0.66rem/1 system-ui, -apple-system, sans-serif; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--rt-code-muted); pointer-events: none;
+  transition: opacity 0.15s;
+}
+.center article pre[data-language="plaintext"]::before,
+.center article pre[data-language="text"]::before { content: none; }
+.center article pre:hover::before, .center article pre:focus-within::before { opacity: 0; }
+.center article pre > .clipboard-button {
+  top: 0.35rem !important; right: 0.35rem !important; margin: 0 !important; z-index: 2;
+  background: var(--rt-code-bg) !important; border: 1px solid var(--rt-code-border) !important;
+  border-radius: 6px !important; color: var(--rt-code-muted);
+}
+.center article pre > .clipboard-button svg { fill: currentColor; }
+.center article pre > .clipboard-button:hover { color: var(--secondary); }
+@media (hover: none) {
+  /* touch screens can't hover: always show copy, drop the label */
+  .center article pre > .clipboard-button { opacity: 1 !important; }
+  .center article pre[data-language]::before { content: none; }
+}
+/* inline code */
+.center article :not(pre) > code {
+  background: var(--rt-code-bg) !important; border: 1px solid var(--rt-code-border) !important;
+  border-radius: 5px !important; padding: 0.08em 0.36em !important;
+  font-size: 0.86em !important; overflow-wrap: anywhere;
+}
+/* reader themes use their own palette */
+html[data-reader] { --rt-code-bg: var(--code-background); --rt-code-border: var(--lightgray); --rt-code-muted: var(--gray); }
+
 @media print {
-  #rt-topbar, #rt-bottombar, #rt-panel, #rt-float { display: none !important; }
+  #rt-topbar, #rt-bottombar, #rt-panel, #rt-float, #rt-settings { display: none !important; }
 }
 `
 
@@ -669,6 +1103,7 @@ export const ReadingTools = () => {
         button("left", "Toggle left sidebar ([)", ICONS.left),
         button("right", "Toggle right sidebar (])", ICONS.right),
         button("reader", "Reader mode (R)", ICONS.reader),
+        button("settings", "Settings (,)", ICONS.settings),
       ],
     })
   const css = JSON.stringify(CSS)
