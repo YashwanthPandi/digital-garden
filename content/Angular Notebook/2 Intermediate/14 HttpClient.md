@@ -70,7 +70,7 @@ Or skip the subscribe and use the [[13 Observables and RxJS#Async pipe|async pip
 
 ## Typed responses
 
-Pass the type as a generic (`get<User[]>`) so `data` is typed. Use interfaces instead of `any` (see [[TypeScript Notebook/Objects and Interfaces|Objects and Interfaces]]).
+Pass the type as a generic (`get<User[]>`) so `data` is typed. Use interfaces instead of `any` (see [[TypeScript Notebook/09 Objects and Structured Data|Objects and Interfaces]]).
 
 ## Headers and query params
 

@@ -69,7 +69,7 @@ Person.species;          // 'human'
 | Polymorphism | overriding methods (`greet` above) |
 | Abstraction | expose simple methods, hide details |
 
-For deeper OOP (with types), see [[TypeScript Notebook/OOP in TypeScript/index|OOP in TypeScript]].
+For deeper OOP (with types), see [[TypeScript Notebook/12 Object-Oriented Programming|OOP in TypeScript]].
 
 > [!question] Recall
 > 1. What is the prototype chain?
