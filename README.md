@@ -1,17 +1,22 @@
-# Quartz v5
+# Digital Garden
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+My notes, published at https://notes.yashwanth.co.in — built with [Quartz v5](https://quartz.jzhao.xyz/).
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
+## Where things live
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+| Path                         | What it is                                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------------- |
+| `content/`                   | **Your notes.** Every Markdown file here becomes a page. `content/index.md` is the home page. |
+| `quartz.config.yaml`         | **Your site settings** — title, base URL, theme colors, fonts, and which plugins are on.      |
+| `quartz.config.default.yaml` | Quartz's defaults (used as a fallback; don't edit).                                           |
+| `quartz/`                    | The Quartz engine itself. You normally don't touch this.                                      |
+| `quartz/styles/custom.scss`  | Your own CSS tweaks.                                                                          |
+| `package.json`               | Node dependencies and scripts.                                                                |
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
+## Commands
 
-## Sponsors
-
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+```bash
+npm ci                         # install dependencies
+npx quartz build --serve       # preview locally at http://localhost:8080
+npx quartz build               # build the site into public/
+```
