@@ -41,6 +41,23 @@ A block of HTML that is **not rendered** until something tells Angular to render
 
 Useful for reusable chunks and for components that let the parent pass a template in (via `@ContentChild(TemplateRef)` or `input<TemplateRef<any>>()`).
 
+### What `*` expands to
+
+The `*` in `*ngFor` / `*ngIf` is shorthand for wrapping the element in an `<ng-template>`. These two are identical:
+
+```html
+<li *ngFor="let item of items; let i = index">{{ i }} {{ item }}</li>
+
+<ng-template ngFor let-item [ngForOf]="items" let-i="index">
+  <li>{{ i }} {{ item }}</li>
+</ng-template>
+```
+
+`let-item` declares a template variable; `[ngForOf]` is the real input name behind `of items`. You rarely write the long form, but it explains error messages and how to [[16 Custom Directives#Custom structural directive|write your own structural directive]].
+
+> [!note] `<template>` → `<ng-template>`
+> Angular 2 used a plain `<template>` tag. Angular 4 renamed it `<ng-template>` (so it doesn't clash with the HTML `<template>` element) and later removed the old name.
+
 ## `ng-container`
 
 A grouping element that **doesn't add anything to the DOM**. Use it to apply a structural directive without an extra `<div>`, or to host `ngTemplateOutlet`.

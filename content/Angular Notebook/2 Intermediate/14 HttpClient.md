@@ -72,6 +72,19 @@ Or skip the subscribe and use the [[13 Observables and RxJS#Async pipe|async pip
 
 Pass the type as a generic (`get<User[]>`) so `data` is typed. Use interfaces instead of `any` (see [[TypeScript Notebook/09 Objects and Structured Data|Objects and Interfaces]]).
 
+The generic is only a promise to the compiler: nothing checks the JSON at runtime. When the API's shape doesn't match what the UI wants (different names, dates as strings), convert it in the service with `map`, so components only see your own model:
+
+```ts
+getPost(id: number): Observable<Post> {
+  return this.http.get<PostDto>(`/api/posts/${id}`).pipe(
+    map((dto) => ({ id: dto.id, title: dto.title, published: new Date(dto.published_at) })),
+  );
+}
+```
+
+> [!note] Old `Http` (Angular 2–4)
+> Before HttpClient (added in v4.3) there was `Http` from `@angular/http`. It returned a `Response` you had to unpack by hand: `this.http.get(url).map((res: Response) => res.json())`. It was deprecated in v5 and later removed. If you see `res.json()`, `HttpModule` or `RequestOptions`, you're reading pre-2018 code.
+
 ## Headers and query params
 
 ```ts
@@ -110,5 +123,36 @@ ngOnInit() {
 ```
 
 Newer option: `httpResource()` gives you `value()`, `isLoading()`, `error()` as signals (see [[22 Signals#Resources|Signals]]).
+
+## Fake backend: in-memory web API
+
+When the real API doesn't exist yet (or for demos), `angular-in-memory-web-api` intercepts HttpClient calls and answers them from an in-memory "database". GET, POST, PUT and DELETE all work, so you can build the whole frontend first.
+
+```bash
+npm install angular-in-memory-web-api --save-dev
+```
+
+```ts
+// in-memory-data.service.ts
+export class InMemoryData implements InMemoryDbService {
+  createDb() {
+    const heroes = [{ id: 1, name: 'Narco' }, { id: 2, name: 'Bombasto' }];
+    const tags = [{ id: 1, name: 'Angular' }];
+    return { heroes, tags };            // each key becomes an endpoint: api/heroes, api/tags
+  }
+}
+
+// app.config.ts
+providers: [
+  provideHttpClient(),
+  importProvidersFrom(HttpClientInMemoryWebApiModule.forRoot(InMemoryData, { delay: 300 })),
+]
+```
+
+```ts
+this.http.get<Hero[]>('api/heroes');            // answered from memory, with a fake 300ms delay
+```
+
+Remove it (or only add it in development) when the real backend is ready.
 
 Related: [[19 HTTP Interceptors|HTTP Interceptors]] (add tokens to every request), [[17 JWT Authentication|JWT Authentication]].

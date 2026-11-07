@@ -71,4 +71,4 @@ Property decorators are used on class properties to define their behaviour and e
 export class AppModule {}
 ```
 
-In real life: modules were used heavily before Angular v19; from v19 they are not used much, we can use **standalone components**. See [[21 Standalone Architecture|Standalone Architecture]].
+In real life: modules were used heavily before Angular v19; from v19 they are not used much, we can use **standalone components**. See [[21 Standalone Architecture|Standalone Architecture]]; what each `@NgModule` property does is in [[21 Standalone Architecture#Working with NgModules (older apps)|Working with NgModules]].

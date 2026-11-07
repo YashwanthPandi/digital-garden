@@ -163,3 +163,56 @@ open() {
 ```
 
 Or declaratively: `<ng-container *ngComponentOutlet="currentWidget" />`.
+
+### Choosing where the component goes
+
+Injecting `ViewContainerRef` in a component puts new components **next to** that component. To put them in a specific spot, mark it in the template and query it with `read: ViewContainerRef`:
+
+```ts
+@Component({
+  template: `
+    <button (click)="add(ChartWidget)">Add chart</button>
+    <button (click)="add(DataWidget)">Add table</button>
+    <ng-container #host />
+  `,
+})
+export class Dashboard {
+  host = viewChild.required('host', { read: ViewContainerRef });
+  protected ChartWidget = ChartWidget;
+  protected DataWidget = DataWidget;
+
+  add(type: Type<unknown>) {
+    const ref = this.host().createComponent(type);   // returns a ComponentRef
+    // ref.setInput('title', 'Sales');               // pass inputs
+    // ref.instance.closed.subscribe(() => ref.destroy());   // listen to outputs
+  }
+}
+```
+
+### A wrapper that swaps components
+
+A component that takes a component **type** as input and shows it, replacing the old one whenever the input changes:
+
+```ts
+@Component({ selector: 'app-dynamic-host', template: `<ng-container #target />` })
+export class DynamicHost {
+  type = input.required<Type<unknown>>();
+  private target = viewChild.required('target', { read: ViewContainerRef });
+
+  constructor() {
+    effect(() => {
+      this.target().clear();                  // destroys the previous component
+      this.target().createComponent(this.type());
+    });
+  }
+}
+```
+
+```html
+<app-dynamic-host [type]="currentStep" />
+```
+
+`clear()` (or `ref.destroy()`) matters: dynamically created components aren't destroyed automatically until their container is.
+
+> [!note] Before Ivy (Angular 2–8)
+> Creating components from code took extra steps: inject `ComponentFactoryResolver`, call `resolveComponentFactory(ChildComponent)`, pass the **factory** to `createComponent(factory)`, and list the component in the module's **`entryComponents`** array (otherwise the compiler left it out of the build). With Ivy (v9+) you pass the class directly; `entryComponents` and `ComponentFactoryResolver` are deprecated and gone.

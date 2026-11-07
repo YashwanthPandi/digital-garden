@@ -77,6 +77,39 @@ Loops through an array and creates one element per item.
 
 Implicit variables: `$index`, `$count`, `$first`, `$last`, `$even`, `$odd`. `@empty` renders when the list is empty.
 
+In `*ngFor` the same values exist without the `$`, and you alias them with `let`:
+
+```html
+<div *ngFor="let note of notes; let i = index; let isFirst = first; let isLast = last">
+  <h3>{{ i }}: {{ note }}</h3>
+  <span *ngIf="isLast">End of list</span>
+</div>
+```
+
+`index`, `count`, `first`, `last`, `even`, `odd`. All are booleans except `index` and `count`.
+
+`trackBy` in `*ngFor` takes a **function** (where `@for` just takes an expression):
+
+```html
+<li *ngFor="let user of users; trackBy: trackById">{{ user.name }}</li>
+```
+
+```ts
+trackById(index: number, user: User) { return user.id; }
+```
+
+### Only one structural directive per element
+
+`<div *ngFor="…" *ngIf="…">` is an error: each `*` wraps the element in its own `<ng-template>`, and Angular can't tell which should go first. Nest them instead, and use `<ng-container>` so you don't add an extra `<div>` to the page:
+
+```html
+<ng-container *ngFor="let item of items">
+  <div *ngIf="item.price > 100">{{ item.name }}</div>
+</ng-container>
+```
+
+With `@for` / `@if` blocks the problem doesn't exist: just put the `@if` inside the `@for`.
+
 ### `ngSwitch` / `@switch`
 
 Shows **one element among many** based on a matching value.
@@ -120,6 +153,16 @@ Applies inline styles dynamically.
 ```
 
 Other built-in attribute directive: `ngModel` (see [[15 Forms|Forms]]).
+
+### Binding without a directive
+
+For a single class, style or attribute, plain bindings are shorter than `ngClass` / `ngStyle` (see [[05 Data Binding#Attribute, class and style bindings|Data Binding]]):
+
+```html
+<div [class.active]="isActive"></div>
+<span [style.color]="'red'"></span>
+<p [attr.data-note]="note">A lot of text here</p>
+```
 
 ## Component directive
 

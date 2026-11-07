@@ -71,6 +71,21 @@ showMessage() { alert('Button clicked!'); }
 onType(e: Event) { this.text = (e.target as HTMLInputElement).value; }
 ```
 
+### Global events: `window:` and `document:`
+
+Prefix the event name to listen on the whole window or document instead of the element. Example: hide a panel on small screens.
+
+```html
+<p [hidden]="!wide" (window:resize)="onResize($event)">Only on wide screens</p>
+```
+
+```ts
+wide = window.innerWidth >= 768;
+onResize(e: UIEvent) { this.wide = (e.target as Window).innerWidth >= 768; }
+```
+
+Same idea inside a directive with `@HostListener('window:resize', ['$event'])` (see [[16 Custom Directives|Custom Directives]]). For pure layout changes, a CSS media query is cheaper than a resize listener.
+
 ## Two-way binding
 
 Keeps view and component in sync automatically: **two-way = property binding + event binding** ("banana in a box" `[( )]`). `ngModel` needs `FormsModule` in the component's `imports`.

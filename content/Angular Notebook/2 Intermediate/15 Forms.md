@@ -128,9 +128,88 @@ form = new FormGroup({ password: new FormControl(''), confirm: new FormControl('
 
 **Async validators** return an Observable/Promise (e.g. "is this username taken?" via an API) and set `status` to `PENDING` while running.
 
+```ts
+export function uniqueUsername(api: UserApi): AsyncValidatorFn {
+  return (control) =>
+    api.exists(control.value).pipe(
+      map((taken) => (taken ? { usernameTaken: true } : null)),
+      catchError(() => of(null)),          // API down: don't block the form
+    );
+}
+
+username = new FormControl('', {
+  validators: [Validators.required, noSpaces],     // sync: run first, on every change
+  asyncValidators: [uniqueUsername(inject(UserApi))],  // async: only when sync ones pass
+  updateOn: 'blur',                                // validate when leaving the field, not per key
+});
+```
+
+```html
+@if (username.pending) { <small>Checking…</small> }
+@if (username.hasError('usernameTaken')) { <small>That name is taken</small> }
+```
+
+Validator rules to remember: return `null` when valid, an error object (`{ errorName: true }` or with details) when invalid.
+
+### FormBuilder's array syntax
+
+Each control in `fb.group()` can be a small array: **`[initial value, sync validators, async validators]`**.
+
+```ts
+form = this.fb.group({
+  firstInput: ['', [Validators.required, noSpaces], [uniqueUsername(this.api)]],
+  secondInput: ['', Validators.required],
+  name: [{ value: 'default name', disabled: true }],   // start disabled
+});
+```
+
+`Validators.compose([a, b])` merges several validators into one; you'll see it in older code, but passing an array does the same.
+
+Reading and writing a single control: `form.controls.name.value`, `form.controls.name.setValue('x')` (or `form.get('name')`).
+
+### Showing a group error on one field
+
+A cross-field validator on the group puts its error on the **group**: `form.hasError('mismatch')`. To show it next to the "confirm password" input instead, the validator can also mark that control:
+
+```ts
+export const newMatchesConfirm: ValidatorFn = (group) => {
+  const confirm = group.get('confirm')!;
+  const mismatch = group.get('newPW')!.value !== confirm.value;
+  const { mismatch: _old, ...otherErrors } = confirm.errors ?? {};   // keep e.g. "required"
+  const errors = mismatch ? { ...otherErrors, mismatch: true } : otherErrors;
+  confirm.setErrors(Object.keys(errors).length ? errors : null);
+  return mismatch ? { mismatch: true } : null;
+};
+```
+
+Simpler option: keep the error on the group and show the message under the confirm field with `@if (form.hasError('mismatch') && form.controls.confirm.touched)`.
+
 ### Typed forms (v14+)
 
 Reactive forms are strongly typed: `form.value.name` is `string | undefined`. Use `nonNullable` (or `new FormControl('', { nonNullable: true })`) so `reset()` goes back to the initial value instead of `null`.
+
+### Live filtering with `valueChanges`
+
+A standalone `FormControl` (no `<form>` needed) is handy for a search box:
+
+```ts
+search = new FormControl('', { nonNullable: true });
+private all = [{ id: 1, name: 'abc' }, { id: 2, name: 'abce' }, { id: 3, name: 'ced' }];
+results = toSignal(
+  this.search.valueChanges.pipe(map((term) => this.all.filter((i) => i.name.startsWith(term)))),
+  { initialValue: this.all },
+);
+```
+
+```html
+<input [formControl]="search" />
+@for (item of results(); track item.id) { <div>{{ item.id }} - {{ item.name }}</div> }
+```
+
+`toSignal` unsubscribes automatically. For server-side search add `debounceTime` + `switchMap` (see [[13 Observables and RxJS#Higher-order mapping (interview favourite)|RxJS]]).
+
+> [!note] Old forms API
+> Angular 2 release candidates used `Control`, `ControlGroup`, `[ngFormModel]` and `[ngFormControl]` from `@angular/common`. They became `FormControl`, `FormGroup`, `[formGroup]` and `formControlName` in `@angular/forms` (2.0 final). Old answers online still show the RC names.
 
 ## Which one to use?
 

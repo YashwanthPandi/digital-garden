@@ -18,6 +18,24 @@ Angular's built-in protection: **everything bound in templates is treated as unt
 
 `DomSanitizer.bypassSecurityTrustHtml()` / `…TrustUrl()` turns this off. Only use it on content you fully control, never on user input.
 
+When you do need it in several places, a small pipe keeps it in one spot (so it's easy to find in a security review):
+
+```ts
+@Pipe({ name: 'trustedUrl' })
+export class TrustedUrlPipe implements PipeTransform {
+  private sanitizer = inject(DomSanitizer);
+  transform(url: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);   // only for URLs you built yourself
+  }
+}
+```
+
+```html
+<iframe [src]="'https://www.youtube.com/embed/' + videoId | trustedUrl"></iframe>
+```
+
+Which method for which binding: `…TrustHtml` (`[innerHTML]`), `…TrustStyle`, `…TrustScript`, `…TrustUrl` (`<a href>`, `<img src>`), `…TrustResourceUrl` (`<iframe src>`, `<embed src>`, script URLs). In very old code the service was called `DomSanitizationService`.
+
 Don't:
 
 - build templates from user strings

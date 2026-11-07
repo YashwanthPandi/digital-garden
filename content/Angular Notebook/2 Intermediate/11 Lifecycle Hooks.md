@@ -62,6 +62,27 @@ export class MyComponent implements OnInit, OnDestroy {
 
 Modern alternatives: `takeUntilDestroyed()` or `inject(DestroyRef).onDestroy(() => …)`, see [[13 Observables and RxJS#Unsubscribing|Unsubscribing]].
 
+## `ngDoCheck`
+
+Runs on **every** change detection cycle. Use it only for changes Angular can't see on its own: by default `ngOnChanges` fires only when an input gets a **new reference**, so pushing an item into an input array goes unnoticed. A **differ** compares the array with its previous state:
+
+```ts
+export class TagList implements DoCheck {
+  @Input() tags: string[] = [];
+  private differ = inject(IterableDiffers).find([]).create<string>();
+
+  ngDoCheck() {
+    const changes = this.differ.diff(this.tags);
+    if (changes) {
+      changes.forEachAddedItem((r) => console.log('Added', r.item));
+      changes.forEachRemovedItem((r) => console.log('Removed', r.item));
+    }
+  }
+}
+```
+
+Keep the work in `ngDoCheck` tiny, because it runs constantly. Usually the better fix is updating immutably (`tags = [...tags, x]`) or using signals.
+
 ## `ngAfterViewInit`
 
 Runs once after the component's view and child elements are fully initialized. Use it to safely access `@ViewChild` / `@ViewChildren`: in the constructor (and often `ngOnInit`) they're still `undefined`.
@@ -77,6 +98,10 @@ export class App implements AfterViewInit {
 ```
 
 > [!warning] Changing bound data inside `ngAfterViewInit` can throw `ExpressionChangedAfterItHasBeenCheckedError` (dev mode), because the view was already checked.
+
+Old code got around this by waiting one tick: `setTimeout(() => this.seconds = this.timer.seconds)`. Data in Angular flows **one way**, parent → child, in a single pass, so a parent can't change what it already displayed in the same pass. Today a signal (or `computed`) is the cleaner fix: Angular re-renders it when it changes.
+
+It's also the right hook for **non-Angular libraries** that need real DOM elements (a jQuery plugin, a chart library), because the template is rendered by then. See [[30 Third-Party Libraries and Packages|Third-Party Libraries]].
 
 ## `ngAfterContentInit`
 

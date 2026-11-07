@@ -79,6 +79,25 @@ export const loggingInterceptor: HttpInterceptorFn = (req, next) => {
 };
 ```
 
-Older class-based interceptors implement `HttpInterceptor` with `intercept(req, next: HttpHandler)` and are registered with `{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }` plus `withInterceptorsFromDi()`.
+Older class-based interceptors implement `HttpInterceptor` with `intercept(req, next: HttpHandler)` and are registered with `{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }` plus `withInterceptorsFromDi()`:
+
+```ts
+@Injectable()
+export class AuthHeaderInterceptor implements HttpInterceptor {
+  private userService = inject(UserService);
+
+  intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    if (this.userService.isAuthenticated()) {
+      req = req.clone({ setHeaders: { Authorization: `Bearer ${this.userService.token}` } });
+    }
+    return next.handle(req);          // class version: next.handle(req), functional: next(req)
+  }
+}
+```
+
+`multi: true` means "add to the list of interceptors" instead of replacing it.
+
+> [!note] Before interceptors (Angular 2–4.2)
+> The old `Http` service had no interceptors, so apps **extended the `Http` class** (overriding `request()` to add headers and catch 401s) and swapped it in with `{ provide: Http, useFactory: …, deps: [XHRBackend, RequestOptions] }`. If you see that in a codebase, it's doing what an interceptor does today.
 
 See [[14 HttpClient|HttpClient]], [[17 JWT Authentication|JWT Authentication]].

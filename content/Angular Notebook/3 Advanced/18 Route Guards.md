@@ -48,6 +48,25 @@ export const authGuard: CanActivateFn = (route, state) => {
 
 `inject()` gets a service instance inside a function, where there's no constructor.
 
+### Async guard: wait for the server
+
+A guard can return an Observable (or Promise). The router waits for it, e.g. to ask the server who's logged in on the first page load:
+
+```ts
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.fetchCurrentUser().pipe(          // GET /api/users/me
+    map((user) => (user ? true : router.createUrlTree(['/login']))),
+    catchError(() => of(router.createUrlTree(['/login']))),
+  );
+};
+```
+
+The Observable must **emit and complete** (HTTP calls do). A guard that subscribes internally and returns nothing never lets the navigation finish; that's a classic bug in old examples.
+
+Combine it with a resolver on the same route so the page receives the user it needs: `canActivate: [authGuard], resolve: { currentUser: currentUserResolver }` (see [[12 Routing#Resolvers|Resolvers]]).
+
 ### Class guard: `CanActivate` interface (older, deprecated style)
 
 ```ts

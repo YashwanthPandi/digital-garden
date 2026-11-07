@@ -193,6 +193,35 @@ getUsers() {
 | `forkJoin([a$, b$])` | wait for all to **complete**, emit once (parallel HTTP calls) |
 | `merge(a$, b$)` | interleave emissions |
 
+### Waiting for several requests: `forkJoin`
+
+Load posts and tags in parallel and continue once **both** have finished. Results come back in the same order you passed them in:
+
+```ts
+loadData() {
+  forkJoin([this.blogApi.getPosts(), this.blogApi.getTags()]).subscribe(([posts, tags]) => {
+    this.posts = posts;
+    this.tags = tags;
+  });
+}
+```
+
+Or with an object, so the names are clearer: `forkJoin({ posts: getPosts(), tags: getTags() })` → `{ posts, tags }`. If **any** request fails, `forkJoin` fails; add `catchError` to each request if you want partial results. (Old code: `Observable.forkJoin(a, b)`; RxJS 6+ imports `forkJoin` as a function.)
+
+### Requests that depend on each other: no nested subscribes
+
+When request 2 needs the result of request 1, don't put a `subscribe` inside a `subscribe` (it's hard to read, hard to cancel, and errors get lost):
+
+```ts
+// ✗ pyramid of subscribes
+http.get('resource1').subscribe((a) => http.get(`resource2?id=${a.id}`).subscribe((b) => …));
+
+// ✓ chain with an operator, subscribe once
+this.http.get<A>('resource1').pipe(
+  switchMap((a) => this.http.get<B>(`resource2?id=${a.id}`).pipe(map((b) => [a, b] as const))),
+).subscribe(([a, b]) => (this.data = { a, b }));
+```
+
 ### Higher-order mapping (interview favourite)
 
 Each maps a value to an **inner Observable** (e.g. an HTTP call); they differ in what happens when a new value arrives while the previous inner one is still running.

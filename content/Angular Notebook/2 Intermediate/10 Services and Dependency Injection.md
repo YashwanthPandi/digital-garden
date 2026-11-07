@@ -101,3 +101,50 @@ providers: [
 export const API_URL = new InjectionToken<string>('API_URL');
 private apiUrl = inject(API_URL);
 ```
+
+> [!note] Old style: string tokens
+> Older code used plain strings as tokens: `{ provide: 'legacyModel', useValue: data }` and `constructor(@Inject('legacyModel') model)`. It works, but typos aren't caught and there's no type. Prefer `InjectionToken`.
+
+## Async service methods
+
+A service method that does slow work (HTTP, storage) returns something asynchronous, and the component waits for it:
+
+```ts
+getData(): Promise<number[]> { return Promise.resolve([1, 2, 3]); }   // or an Observable
+```
+
+```ts
+ngOnInit() { this.myService.getData().then((data) => (this.data = data)); }
+```
+
+In Angular you'll usually return an **Observable** from HttpClient instead (see [[14 HttpClient|HttpClient]]), but the idea is the same: the component never assumes the data is already there.
+
+## Passing data in before the app starts
+
+Sometimes the app needs values that exist **before** Angular boots: config from the server page, data from a legacy (non-Angular) part of the site, feature flags.
+
+**1. Hand the values to `bootstrapApplication`** as providers, then inject them anywhere:
+
+```ts
+// main.ts
+export const LEGACY_DATA = new InjectionToken<LegacyModel>('LEGACY_DATA');
+
+export function startApp(legacyModel: LegacyModel) {
+  return bootstrapApplication(App, {
+    providers: [...appConfig.providers, { provide: LEGACY_DATA, useValue: legacyModel }],
+  });
+}
+```
+
+```ts
+private legacy = inject(LEGACY_DATA);
+```
+
+**2. Load something while the app starts** (e.g. fetch `config.json`). Angular waits for the Promise/Observable before rendering:
+
+```ts
+// app.config.ts
+providers: [provideAppInitializer(() => inject(ConfigService).load())]
+```
+
+(Older apps: `{ provide: APP_INITIALIZER, useFactory: …, multi: true }`.)

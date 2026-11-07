@@ -47,3 +47,56 @@ Timeline: standalone introduced in v14 (preview) → stable v15 → default for 
 | Karma + Jasmine tests | **Vitest** by default (v21) |
 
 Load flow: before, `index.html` → `main.ts` → `app.module.ts` → `app.component.ts` → template. Now, `index.html` → `main.ts` → `app.ts` → `app.html`. See [[02 Architecture|Architecture]].
+
+## Working with NgModules (older apps)
+
+Plenty of jobs still mean maintaining a module-based app, so know what each `@NgModule` property does:
+
+```ts
+@NgModule({
+  declarations: [ProductList, ProductCard, PricePipe],  // components/directives/pipes this module OWNS
+  imports: [CommonModule, FormsModule, SharedModule],   // other modules whose exports we use
+  exports: [ProductList],                               // what modules importing us may use
+  providers: [ProductService],                          // services for DI
+  bootstrap: [AppComponent],                            // root module only: the first component
+})
+export class ProductsModule {}
+```
+
+| Property | Holds | Rule |
+| --- | --- | --- |
+| `declarations` | components, directives, pipes | each one declared in **exactly one** module (`ng g c` adds it for you) |
+| `imports` | **modules** only | gives this module's templates access to their exports |
+| `exports` | declarations or modules | private by default; export to share |
+| `providers` | services | app-wide when the module is eagerly loaded |
+| `bootstrap` | root component | only in `AppModule` |
+
+`BrowserModule` goes only in the root module; feature modules import `CommonModule` (which gives `*ngIf`, `*ngFor`, pipes).
+
+Common ways teams split modules:
+
+- **Feature module** (`ProductsModule`, `AdminModule`): one area of the app, often lazy-loaded (see [[12 Routing#Lazy loading|Lazy loading]]).
+- **Shared module**: reusable components/pipes/directives, declared and **exported** once and imported wherever needed.
+- **Core module**: app-wide singletons (header, auth service), imported once in `AppModule`.
+
+```ts
+// main.ts in a module-based app
+platformBrowserDynamic().bootstrapModule(AppModule).catch((err) => console.error(err));
+```
+
+### Barrel files
+
+A barrel is an `index.ts` that re-exports a folder's public pieces, so imports get shorter:
+
+```ts
+// heroes/index.ts
+export * from './hero.model';
+export * from './hero.service';
+export { HeroComponent } from './hero.component';
+```
+
+```ts
+import { Hero, HeroService } from '../heroes';   // instead of three separate imports
+```
+
+Libraries use the same idea for their public API (`public-api.ts`). Inside an app, don't overdo them: big barrels can create circular imports and make it harder for the build to drop unused code.

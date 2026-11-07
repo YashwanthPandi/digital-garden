@@ -117,6 +117,55 @@ ngOnInit() {
 
 `AdminLayout`'s template needs its own `<router-outlet>`.
 
+### A default child
+
+Visiting just `/admin` matches the parent but none of the children, so the inner outlet stays empty. Add an **empty-path child** as the entry point, either a component or a redirect:
+
+```ts
+children: [
+  { path: '', redirectTo: 'users', pathMatch: 'full' },   // /admin → /admin/users
+  { path: 'users', component: Users },
+  { path: 'settings', component: Settings },
+]
+```
+
+Links inside the child layout can be **relative** (no leading `/`): `<a routerLink="settings">` from `/admin/users` goes to `/admin/settings`.
+
+A parent route doesn't even need a component. Here it only groups URLs:
+
+```ts
+{
+  path: 'home',
+  children: [
+    { path: '', component: Home },                  // /home
+    { path: 'counter', component: Counter },        // /home/counter
+  ],
+}
+```
+
+### Splitting routes across files
+
+Keep each feature's routes next to the feature and spread them into the main array:
+
+```ts
+// reports/reports.routes.ts
+export const REPORT_ROUTES: Routes = [{ path: 'reports', children: [/* … */] }];
+
+// app.routes.ts
+export const routes: Routes = [...REPORT_ROUTES, { path: '', redirectTo: 'home', pathMatch: 'full' }];
+```
+
+(With lazy loading, `loadChildren` does this for you and also splits the code.)
+
+### Building links from data
+
+`routerLink` takes an array: the path first, then route params.
+
+```html
+@for (link of links; track link) { <a [routerLink]="link">{{ link }}</a> }   <!-- links = ['home', 'login'] -->
+<a [routerLink]="['/bars', bar.id]">{{ bar.name }}</a>                       <!-- /bars/42 -->
+```
+
 ## Lazy loading
 
 Load a component or a group of routes only when the user navigates there, so the initial bundle is smaller.
@@ -127,6 +176,42 @@ Load a component or a group of routes only when the user navigates there, so the
 ```
 
 Preloading: `provideRouter(routes, withPreloading(PreloadAllModules))` downloads lazy chunks in the background after startup.
+
+> [!note] Lazy loading in older apps
+> Before Angular 8, `loadChildren` was a **string**: `loadChildren: './lazy/lazy.module#LazyModule'`. It was replaced by the `import()` function form above. Module-based apps lazy-load a whole NgModule: `loadChildren: () => import('./lazy/lazy.module').then((m) => m.LazyModule)`, and that module registers its own routes with `RouterModule.forChild(routes)` (see below).
+
+## `RouterModule.forRoot` vs `forChild` (module-based apps)
+
+Older apps register routes through NgModules instead of `provideRouter`:
+
+```ts
+@NgModule({
+  imports: [RouterModule.forRoot(appRoutes)],   // root module: ONCE, creates the Router service
+  exports: [RouterModule],                      // so components can use routerLink / router-outlet
+})
+export class AppRoutingModule {}
+
+@NgModule({ imports: [RouterModule.forChild(lazyRoutes)] })   // feature / lazy modules
+export class LazyModule {}
+```
+
+- **`forRoot()`**: routes **plus** the router's providers (the `Router` service itself). Call it only in the root module. Calling it again in a lazy module creates a second router, which breaks navigation.
+- **`forChild()`**: routes only, no providers.
+
+This `forRoot` / `forChild` pattern is a common interview question, and other libraries use it too (e.g. `StoreModule.forRoot` in NgRx).
+
+## Going back and forward: `Location`
+
+`Location` talks to the browser's URL and history without a full route change. Handy for a "Back" button:
+
+```ts
+private location = inject(Location);   // from @angular/common
+
+back()    { this.location.back(); }
+forward() { this.location.forward(); }
+```
+
+`location.go('/foo')` changes the URL and adds a history entry **without** navigating. Use `Router` for real navigation.
 
 ## Resolvers
 

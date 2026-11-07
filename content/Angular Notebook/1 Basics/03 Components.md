@@ -79,3 +79,69 @@ Styles in a component's CSS only apply to **that component's template** by defau
 | `ViewEncapsulation.ShadowDom` | uses the browser's real Shadow DOM |
 
 Special selectors: `:host` (the component's own element), `::ng-deep` (pierce into children, deprecated, avoid). Global styles go in `src/styles.css`.
+
+Two ways to attach styles, like templates:
+
+```ts
+@Component({
+  styleUrl: './card.css',                     // a file (styleUrls: [...] for several)
+  styles: [`div { background: lime; }`],      // inline
+})
+```
+
+> [!warning] Old webpack setups sometimes loaded styles with `styles: [require('./card.css')]`. That worked in development but the styles disappeared in production builds. Use `styleUrl` / `styles`.
+
+## Setting the page title
+
+The browser tab title lives in `<head>`, outside every component. Angular's `Title` service changes it:
+
+```ts
+export class ProductPage {
+  private title = inject(Title);   // from @angular/platform-browser
+
+  ngOnInit() {
+    this.title.setTitle('Running shoes | My Shop');
+  }
+}
+```
+
+For titles per route, the `title` property in the route config is simpler (see [[12 Routing|Routing]]). The `Meta` service does the same for `<meta>` tags (description, social previews).
+
+## Example: image picker with preview
+
+A reusable component that shows the chosen picture before it's uploaded, and tells the parent which file was picked:
+
+```ts
+@Component({
+  selector: 'app-image-preview',
+  template: `
+    <input type="file" accept="image/*" (change)="onPick($event)" />
+    @if (source()) { <img [src]="source()" alt="Preview" /> }
+  `,
+})
+export class ImagePreview {
+  picked = output<File>();
+  source = signal('');
+
+  onPick(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.source.set(reader.result as string);   // data: URL the <img> can show
+      this.picked.emit(file);
+    };
+    reader.readAsDataURL(file);
+  }
+}
+```
+
+```html
+<!-- parent -->
+<form (ngSubmit)="upload()">
+  <app-image-preview (picked)="file = $event" />
+  <button type="submit">Upload</button>
+</form>
+```
+
+It combines event binding, a signal for state, and an output for the parent (see [[09 Component Communication|Component Communication]]).

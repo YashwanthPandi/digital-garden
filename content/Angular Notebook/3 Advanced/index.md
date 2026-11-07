@@ -4,7 +4,7 @@ tags:
   - Angular
 ---
 
-Interview-ready topics: authentication and securing routes/requests, DOM queries and content projection, modern Angular (standalone, signals), and what senior interviews ask about: performance, state, SSR, testing and security.
+Interview-ready topics: authentication and securing routes/requests, DOM queries and content projection, modern Angular (standalone, signals), and what senior interviews ask about: performance, state, SSR, testing and security. Then animations, offline apps, and working with code outside Angular.
 
 Previous: [[Angular Notebook/2 Intermediate/index|2. Intermediate]] · Next: [[Angular Notebook/4 Interview Questions/index|4. Interview Questions]]
 
@@ -19,3 +19,6 @@ Previous: [[Angular Notebook/2 Intermediate/index|2. Intermediate]] · Next: [[A
 25. [[25 SSR and Hydration|SSR and Hydration]]
 26. [[26 Testing|Testing]]
 27. [[27 Security|Security]]: XSS, CSRF, token storage
+28. [[28 Animations|Animations]]: `animate.enter` / `animate.leave`, `@angular/animations` triggers and states
+29. [[29 PWA and Service Workers|PWA and Service Workers]]: offline support, caching, updates
+30. [[30 Third-Party Libraries and Packages|Third-Party Libraries and Packages]]: jQuery and plugins, wrapper libraries, web components, publishing a library, hosting behind a backend

@@ -13,6 +13,26 @@ tags:
 
 Zone.js patches browser async APIs (clicks, `setTimeout`, HTTP, promises). After any of them finishes, Angular runs CD over the **whole component tree, top to bottom**, comparing every binding. Simple but wasteful in large apps.
 
+#### `NgZone`: stepping outside the zone
+
+In a Zone.js app, inject `NgZone` to run code **without** triggering change detection, then step back in only when the screen needs to update:
+
+```ts
+private zone = inject(NgZone);
+
+ngOnInit() {
+  this.zone.runOutsideAngular(() => {
+    // mousemove fires dozens of times a second: no change detection for each one
+    window.addEventListener('mousemove', (e) => {
+      this.lastX = e.clientX;
+      if (e.clientX > 500) this.zone.run(() => (this.pastHalfway = true));   // back inside: UI updates
+    });
+  });
+}
+```
+
+Typical uses: scroll/mouse/resize handlers, `setInterval` polling, third-party libraries with their own timers, running several requests and updating the view only once at the end. In zoneless apps this isn't needed: nothing re-renders unless a signal (or `markForCheck`) says so.
+
 ### `OnPush` strategy
 
 ```ts
