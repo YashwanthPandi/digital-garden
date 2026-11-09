@@ -129,8 +129,9 @@ plugins:
       passwordField: password
       unlistWhenEncrypted: false
       outputPath: static/encryptedContentIndex.json
+  # Disabled: it opened every clicked link as a new tab in a side "binder"
   - source: "@quartz-community/stacked-pages"
-    enabled: true
+    enabled: false
     layout:
       position: afterBody
       priority: 50
