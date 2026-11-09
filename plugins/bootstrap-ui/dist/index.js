@@ -41,7 +41,55 @@ const BRIDGE = `
   --bs-success: #8fb38f;
   --bs-success-rgb: 143, 179, 143;
 }
+/* One accent for the whole site: the notebook green. The Quartz theme plugin builds
+   its accent (links, explorer, TOC, graph) from --accent-h/s/l on :root:root and uses
+   a yellow --highlight; this outranks both so nothing stays purple or yellow. */
+:root:root:root {
+  --accent-h: 138; --accent-s: 26%; --accent-l: 34%;
+  --highlight: rgba(63, 107, 74, 0.09);
+  --textHighlight: rgba(255, 214, 102, 0.45);
+}
+:root:root:root[saved-theme="dark"] {
+  --accent-h: 120; --accent-s: 22%; --accent-l: 56%;
+  --highlight: rgba(143, 179, 143, 0.12);
+  --textHighlight: rgba(179, 170, 2, 0.4);
+}
 body { background-color: var(--light); color: var(--darkgray); }
+
+/* Quartz chrome headings: Bootstrap's big h2/h3 sizes leaked into them */
+html body h2.page-title, html body h2.page-title a { font-size: 1.45rem; }
+.page-title { font-size: 1.45rem; line-height: 1.2; margin: 0 0 0.5rem; overflow-wrap: normal; word-break: normal; }
+.page-title a { color: var(--dark); background: none; }
+.page-title a:hover { color: var(--secondary); }
+.sidebar :is(h2, h3):not(.page-title), .sidebar .toc-header h3, .sidebar .graph h3 {
+  font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--gray); margin: 0;
+}
+.sidebar .graph-header, .sidebar .toc-header { color: var(--gray); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--headerFont), system-ui, sans-serif; }
+.sidebar .explorer :is(h2, .title, button.title-button) { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray); }
+.center .page-listing h3, .center .section-li h3 { font-size: 1.05rem; font-weight: 600; margin: 0; line-height: 1.35; }
+.center .page-listing .meta { font-size: 0.85rem; color: var(--gray); }
+.center .page-listing ul.tags { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.25rem; justify-content: flex-end; }
+.center .page-listing ul.tags li, .center ul.tags li { list-style: none; background: none !important; padding: 0 !important; border-radius: 0; height: auto; }
+.center .page-listing ul.tags li::marker { content: none; }
+.center .page-listing a.tag-link.badge { padding: 0.25em 0.6em; line-height: 1.2; font-size: 0.72rem; height: auto; }
+
+/* inline links in notes: underlined accent text, not highlighted chips */
+.center article a.internal:not(.btn):not(.nb-cover):not(.np-go):not(.tag-link):not(.stretched-link),
+.center article a.external:not(.btn) {
+  background: none; padding: 0; border-radius: 0; color: var(--secondary);
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in srgb, var(--secondary) 35%, transparent);
+}
+.center article a.internal:not(.btn):not(.nb-cover):not(.np-go):not(.tag-link):hover,
+.center article a.external:not(.btn):hover { text-decoration-color: currentColor; }
+.center article .list-group-item > a.internal { text-decoration: none; font-weight: 600; }
+
+/* card headers match the cards (Bootstrap's grey cap looked like a different component) */
+.card-header { background-color: transparent; }
+
+/* breadcrumbs and footer: quiet, same accent */
+footer { opacity: 0.85; font-size: 0.85rem; }
 
 /* Quartz typography the notes rely on */
 a { color: var(--secondary); text-decoration: none; }
@@ -116,7 +164,7 @@ a.internal.btn:hover { background-color: var(--bs-btn-hover-bg); color: var(--bs
 .form-check-label { cursor: pointer; }
 
 /* tags */
-a.tag-link.badge { background-color: var(--bs-secondary-bg) !important; color: var(--darkgray); font-weight: 600; padding: 0.35em 0.7em; }
+a.tag-link.badge { background-color: var(--highlight) !important; color: var(--secondary); font-weight: 600; padding: 0.35em 0.7em; }
 a.tag-link.badge:hover { color: var(--secondary); }
 `
 

@@ -2,3 +2,281 @@
 
 // put your custom CSS here!
 
+
+:root {
+  --cq: 1cqw; // cover text scales with its container
+}
+
+// Home page notebook covers: green grid study-notes cover with a ring binding,
+// the notebook name, "Notebook" bottom right and a "Property of" strip.
+.nb-card {
+  container-type: inline-size;
+  overflow: hidden;
+  border: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 12px 28px rgba(0, 0, 0, 0.16);
+  }
+}
+
+.center article :is(a.internal, span).nb-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border-radius: 0;
+  color: #fff;
+  font-family: var(--headerFont), system-ui, sans-serif;
+  background-color: #264c37;
+  background-image:
+    linear-gradient(rgba(170, 210, 185, 0.32) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(170, 210, 185, 0.32) 1px, transparent 1px);
+  background-size: calc(6.8 * var(--cq)) calc(6.8 * var(--cq));
+  background-position: -1px -1px;
+  overflow: hidden;
+  text-decoration: none;
+
+  &:hover {
+    color: #fff;
+  }
+
+  .nb-rings {
+    position: absolute;
+    top: calc(2.5 * var(--cq));
+    bottom: 0;
+    left: calc(2 * var(--cq));
+    width: calc(4.4 * var(--cq));
+    z-index: 2;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 32'%3E%3Crect x='2' y='2' width='16' height='16' fill='none' stroke='%23e6ece8' stroke-width='1.6'/%3E%3C/svg%3E");
+    background-repeat: repeat-y;
+    background-size: 100% auto;
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.45));
+  }
+
+  .nb-title {
+    position: absolute;
+    left: calc(12 * var(--cq));
+    right: calc(4 * var(--cq));
+    top: 42%;
+    transform: translateY(-50%);
+    font-size: calc(22 * var(--cq));
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+
+    &.nb-long {
+      font-size: calc(16 * var(--cq));
+    }
+  }
+
+  .nb-sub {
+    position: absolute;
+    right: calc(2 * var(--cq));
+    bottom: calc(15 * var(--cq));
+    font-size: calc(11 * var(--cq));
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .nb-strip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(13 * var(--cq));
+    display: flex;
+    align-items: center;
+    padding-left: calc(15 * var(--cq));
+    background: #386a4b;
+    font-family: var(--bodyFont), system-ui, sans-serif;
+    font-size: calc(3.4 * var(--cq));
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+}
+
+// Kindle-style library: a quiet strip under each cover
+.nb-card-body {
+  padding: 0.6rem 0.75rem 0.75rem;
+}
+
+.center article a.internal.np-go {
+  background: none;
+  padding: 0;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--bs-primary);
+}
+
+// "Continue reading": a small copy of the cover
+.nb-mini {
+  flex: 0 0 auto;
+  width: 84px;
+  container-type: inline-size;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+  @media (min-width: 600px) {
+    width: 104px;
+  }
+}
+
+.np-resume .np-resume-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------------------
+// Personal library (home page): a header, then books standing on wooden shelves.
+.lib-hero {
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--lightgray);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(63, 107, 74, 0.12), transparent 60%),
+    var(--light);
+
+  .lib-kicker {
+    letter-spacing: 0.08em;
+  }
+
+  .lib-name {
+    font-family: var(--headerFont), system-ui, sans-serif;
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0.25rem 0 0.5rem;
+    color: var(--dark);
+  }
+
+  .lib-stats {
+    align-items: center;
+
+    .badge {
+      font-weight: 600;
+      color: var(--darkgray) !important;
+      background-color: var(--light) !important;
+    }
+  }
+}
+
+.lib-filter.nav-pills {
+  --bs-nav-pills-link-active-bg: var(--bs-primary);
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  .nav-link {
+    padding: 0.3rem 0.9rem;
+    font-size: 0.9rem;
+    color: var(--darkgray);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .nav-link.active {
+    color: #fff;
+    background-color: var(--bs-primary);
+  }
+}
+
+:root {
+  --lib-wood-top: #c08a57;
+  --lib-wood: #9a6438;
+  --lib-wood-edge: #6e4424;
+}
+
+:root[saved-theme="dark"] {
+  --lib-wood-top: #7a5232;
+  --lib-wood: #5a3a22;
+  --lib-wood-edge: #3a2414;
+}
+
+.lib-shelf {
+  --cq: 0.84cqw; // books are 84% of their slot
+
+  .lib-book {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    container-type: inline-size;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  // books stand a little narrower than their slot, like volumes on a shelf
+  .nb-cover,
+  .nb-ghost {
+    width: 84%;
+    margin: 0 auto;
+  }
+
+  .center article & a.internal.nb-cover,
+  a.internal.nb-cover {
+    border-radius: 2px 4px 4px 2px;
+    box-shadow:
+      inset 5px 0 8px -4px rgba(0, 0, 0, 0.45),
+      2px 4px 10px rgba(0, 0, 0, 0.28);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+    &:hover,
+    &:focus-visible {
+      transform: translateY(-8px);
+      box-shadow:
+        inset 5px 0 8px -4px rgba(0, 0, 0, 0.45),
+        3px 12px 18px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  // the plank runs the full slot width (gutter included) so neighbours join up
+  .lib-plank {
+    position: relative;
+    height: 14px;
+    margin: 0 calc(-0.5 * var(--bs-gutter-x));
+    background: linear-gradient(var(--lib-wood-top), var(--lib-wood) 55%, var(--lib-wood-edge));
+    box-shadow: 0 6px 10px -4px rgba(0, 0, 0, 0.35);
+  }
+
+  .nb-card-body {
+    padding: 0.75rem 8% 1.75rem;
+  }
+}
+
+// placeholder for the next notebook
+.nb-ghost {
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border: 2px dashed var(--gray);
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  color: var(--gray);
+  font-family: var(--headerFont), system-ui, sans-serif;
+
+  span {
+    font-size: 11cqw;
+    font-weight: 600;
+  }
+
+  small {
+    font-size: 6cqw;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+}

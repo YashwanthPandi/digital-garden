@@ -110,7 +110,12 @@ function beforeDOM(css) {
     var h = document.documentElement
     if (s.hideLeft) h.setAttribute("data-hide-left", "")
     if (s.hideRight) h.setAttribute("data-hide-right", "")
-    if (s.reader) h.setAttribute("data-reader", "on")
+    // Notebook chapters open like a Kindle book: reader mode is the default there
+    // ("reader": false once the reader exits it). Other pages never start in it.
+    var path = decodeURIComponent(location.pathname).toLowerCase().replace(/^\//, "").replace(/\.html$/, "")
+    var chapter = /^[^/]+-notebook\/./.test(path) && !/(\/|(^|\/)index)$/.test(path)
+    if (chapter && s.reader !== false) h.setAttribute("data-reader", "on")
+    else h.removeAttribute("data-reader")
     h.setAttribute("data-reader-theme", s.theme || "sepia")
     h.setAttribute("data-reader-font", s.font || "serif")
     h.setAttribute("data-reader-spacing", s.spacing || "normal")
@@ -365,8 +370,12 @@ function afterDOM(css) {
     if (fill) fill.style.width = (p * 100).toFixed(1) + "%"
     if (txt) {
       var left = Math.ceil((words * (1 - p)) / WPM)
+      var unit = chapterPos ? "chapter" : "page"
       txt.textContent =
-        Math.round(p * 100) + "%" + (left > 0 ? " · " + left + " min left in page" : " · end of page")
+        chapterPos +
+        Math.round(p * 100) +
+        "%" +
+        (left > 0 ? " · " + left + " min left in " + unit : " · end of " + unit)
     }
   }
 
@@ -692,6 +701,9 @@ function afterDOM(css) {
     } else if (reading && (e.key === "+" || e.key === "=")) {
       save({ size: Math.min(30, state().size + 1) })
       applySettings()
+    } else if (reading && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      // turn the page: previous / next chapter
+      turn(e.key === "ArrowLeft" ? "prev" : "next")
     } else if (reading && e.key === "-") {
       save({ size: Math.max(14, state().size - 1) })
       applySettings()
@@ -711,8 +723,36 @@ function afterDOM(css) {
   )
   window.addEventListener("resize", updateProgress)
 
+  function isChapter() {
+    var slug = document.body.dataset.slug || ""
+    return /^[^/]+-notebook\/./.test(slug) && !/(^|\/)index$/.test(slug)
+  }
+  // "Chapter 5 of 46" from the notebook-progress chapter list, when present
+  var chapterPos = ""
+  function findChapterPos() {
+    chapterPos = ""
+    if (!isChapter()) return
+    var data = document.querySelector(".np-data")
+    var slug = document.body.dataset.slug
+    try {
+      var nb = slug.match(/^[^/]+-notebook\//)[0]
+      var list = JSON.parse(data.textContent).filter(function (x) {
+        return x.indexOf(nb) === 0
+      })
+      var i = list.indexOf(slug)
+      if (i >= 0) chapterPos = "Chapter " + (i + 1) + " of " + list.length + " · "
+    } catch (e) {}
+  }
+  function turn(dir) {
+    var a = document.querySelector(".bs-pager a." + dir)
+    if (a) a.click()
+  }
+
   function setup() {
     ensureStyle(css)
+    if (isChapter() && load().reader !== false) h.setAttribute("data-reader", "on")
+    else h.removeAttribute("data-reader")
+    findChapterPos()
     closeSettings()
     applySite()
     buildReaderUI()

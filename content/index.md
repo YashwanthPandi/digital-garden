@@ -7,123 +7,140 @@ tags:
 updated: 2026-10-03
 ---
 
-## Your progress
-
-<div class="card shadow-sm mb-4" data-np-overall>
-<div class="card-body">
-<div class="d-flex justify-content-between align-items-baseline mb-2">
-<h3 class="h5 card-title m-0">All notebooks</h3>
-<span class="fs-4 fw-bold np-pct">0%</span>
-</div>
-<div class="progress mb-2" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 14px"><div class="progress-bar progress-bar-striped" style="width: 0%"></div></div>
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-<span class="small text-body-secondary"><span class="np-done">0</span> of <span class="np-count">0</span> chapters completed</span>
-<button type="button" class="btn btn-outline-danger btn-sm" data-np-reset-all disabled>Reset all progress</button>
-</div>
+<div class="lib-hero mb-4" data-np-overall>
+<div class="small text-uppercase fw-semibold text-body-secondary lib-kicker">Yashwanth's Notes</div>
+<div class="lib-name">Personal Library</div>
+<p class="text-body-secondary mb-3">Study notebooks on the web stack, shelved in reading order. Pick up where you left off.</p>
+<div class="d-flex flex-wrap gap-2 lib-stats">
+<span class="badge rounded-pill text-bg-light border">5 notebooks</span>
+<span class="badge rounded-pill text-bg-light border"><span class="np-count">0</span> chapters</span>
+<span class="badge rounded-pill text-bg-light border"><span class="np-done">0</span> read · <span class="np-pct">0%</span></span>
+<span class="badge rounded-pill text-bg-light border"><span class="np-books-done">0</span> finished</span>
+<button type="button" class="btn btn-link btn-sm text-danger p-0 ms-auto" data-np-reset-all disabled>Reset progress</button>
 </div>
 </div>
 
-## Notebooks
-
-<div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
-<div class="col">
-<div class="card h-100 shadow-sm" data-np-notebook="html-notebook/" style="border-top: 4px solid #c2410c">
-<div class="card-body d-flex flex-column">
-<div class="d-flex justify-content-between align-items-start mb-1">
-<h3 class="h5 card-title m-0"><a class="internal stretched-link" href="./html-notebook/">HTML</a></h3>
-<span class="badge rounded-pill text-bg-warning">Seedling</span>
-</div>
-<p class="card-text small text-body-secondary mb-3">Structure, semantics, forms, accessibility, SEO, dialog and popover</p>
-<div class="mt-auto">
-<div class="d-flex justify-content-between small mb-1"><span><span class="np-done">0</span>/<span class="np-count">0</span> chapters</span><span class="fw-semibold np-pct">0%</span></div>
-<div class="progress" role="progressbar" aria-label="HTML progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 10px"><div class="progress-bar" style="width: 0%"></div></div>
-</div>
-</div>
-<div class="card-footer bg-transparent d-flex justify-content-end gap-2 position-relative" style="z-index: 2">
-<a class="btn btn-sm btn-outline-primary internal" href="./html-notebook/">Open notebook</a>
-<a class="btn btn-sm btn-primary internal" href="./html-notebook/" data-np-continue>Start reading</a>
-</div>
-</div>
-</div>
-<div class="col">
-<div class="card h-100 shadow-sm" data-np-notebook="css3-notebook/" style="border-top: 4px solid #6d28d9">
-<div class="card-body d-flex flex-column">
-<div class="d-flex justify-content-between align-items-start mb-1">
-<h3 class="h5 card-title m-0"><a class="internal stretched-link" href="./css3-notebook/">CSS3</a></h3>
-<span class="badge rounded-pill text-bg-warning">Seedling</span>
-</div>
-<p class="card-text small text-body-secondary mb-3">Selectors, box model, Flexbox, Grid, responsive design, animations</p>
-<div class="mt-auto">
-<div class="d-flex justify-content-between small mb-1"><span><span class="np-done">0</span>/<span class="np-count">0</span> chapters</span><span class="fw-semibold np-pct">0%</span></div>
-<div class="progress" role="progressbar" aria-label="CSS3 progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 10px"><div class="progress-bar" style="width: 0%"></div></div>
-</div>
-</div>
-<div class="card-footer bg-transparent d-flex justify-content-end gap-2 position-relative" style="z-index: 2">
-<a class="btn btn-sm btn-outline-primary internal" href="./css3-notebook/">Open notebook</a>
-<a class="btn btn-sm btn-primary internal" href="./css3-notebook/" data-np-continue>Start reading</a>
-</div>
-</div>
-</div>
-<div class="col">
-<div class="card h-100 shadow-sm" data-np-notebook="javascript-notebook/" style="border-top: 4px solid #a16207">
-<div class="card-body d-flex flex-column">
-<div class="d-flex justify-content-between align-items-start mb-1">
-<h3 class="h5 card-title m-0"><a class="internal stretched-link" href="./javascript-notebook/">JavaScript</a></h3>
-<span class="badge rounded-pill text-bg-warning">Seedling</span>
-</div>
-<p class="card-text small text-body-secondary mb-3">Core language, DOM, events, closures, async, fetch</p>
-<div class="mt-auto">
-<div class="d-flex justify-content-between small mb-1"><span><span class="np-done">0</span>/<span class="np-count">0</span> chapters</span><span class="fw-semibold np-pct">0%</span></div>
-<div class="progress" role="progressbar" aria-label="JavaScript progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 10px"><div class="progress-bar" style="width: 0%"></div></div>
-</div>
-</div>
-<div class="card-footer bg-transparent d-flex justify-content-end gap-2 position-relative" style="z-index: 2">
-<a class="btn btn-sm btn-outline-primary internal" href="./javascript-notebook/">Open notebook</a>
-<a class="btn btn-sm btn-primary internal" href="./javascript-notebook/" data-np-continue>Start reading</a>
-</div>
-</div>
-</div>
-<div class="col">
-<div class="card h-100 shadow-sm" data-np-notebook="typescript-notebook/" style="border-top: 4px solid #2563eb">
-<div class="card-body d-flex flex-column">
-<div class="d-flex justify-content-between align-items-start mb-1">
-<h3 class="h5 card-title m-0"><a class="internal stretched-link" href="./typescript-notebook/">TypeScript</a></h3>
-<span class="badge rounded-pill text-bg-info">Growing</span>
-</div>
-<p class="card-text small text-body-secondary mb-3">Types, narrowing, generics, utility types, OOP, modules</p>
-<div class="mt-auto">
-<div class="d-flex justify-content-between small mb-1"><span><span class="np-done">0</span>/<span class="np-count">0</span> chapters</span><span class="fw-semibold np-pct">0%</span></div>
-<div class="progress" role="progressbar" aria-label="TypeScript progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 10px"><div class="progress-bar" style="width: 0%"></div></div>
-</div>
-</div>
-<div class="card-footer bg-transparent d-flex justify-content-end gap-2 position-relative" style="z-index: 2">
-<a class="btn btn-sm btn-outline-primary internal" href="./typescript-notebook/">Open notebook</a>
-<a class="btn btn-sm btn-primary internal" href="./typescript-notebook/" data-np-continue>Start reading</a>
-</div>
-</div>
-</div>
-<div class="col">
-<div class="card h-100 shadow-sm" data-np-notebook="angular-notebook/" style="border-top: 4px solid #be123c">
-<div class="card-body d-flex flex-column">
-<div class="d-flex justify-content-between align-items-start mb-1">
-<h3 class="h5 card-title m-0"><a class="internal stretched-link" href="./angular-notebook/">Angular</a></h3>
-<span class="badge rounded-pill text-bg-info">Growing</span>
-</div>
-<p class="card-text small text-body-secondary mb-3">Components, templates, services, DI, routing, RxJS</p>
-<div class="mt-auto">
-<div class="d-flex justify-content-between small mb-1"><span><span class="np-done">0</span>/<span class="np-count">0</span> chapters</span><span class="fw-semibold np-pct">0%</span></div>
-<div class="progress" role="progressbar" aria-label="Angular progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 10px"><div class="progress-bar" style="width: 0%"></div></div>
-</div>
-</div>
-<div class="card-footer bg-transparent d-flex justify-content-end gap-2 position-relative" style="z-index: 2">
-<a class="btn btn-sm btn-outline-primary internal" href="./angular-notebook/">Open notebook</a>
-<a class="btn btn-sm btn-primary internal" href="./angular-notebook/" data-np-continue>Start reading</a>
-</div>
+<div class="card shadow-sm mb-4 np-resume d-none" data-np-resume>
+<div class="card-body d-flex gap-3 align-items-center">
+<div class="nb-mini" data-np-resume-cover></div>
+<div class="flex-grow-1" style="min-width: 0">
+<div class="small text-uppercase fw-semibold text-body-secondary" style="letter-spacing: 0.06em">Continue reading</div>
+<div class="h5 mt-1 mb-1 np-resume-title"></div>
+<div class="small text-body-secondary mb-2 np-resume-meta"></div>
+<div class="progress mb-1" role="progressbar" aria-label="Position in chapter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 4px"><div class="progress-bar" style="width: 0%"></div></div>
+<div class="small text-body-secondary np-resume-nb"></div>
+<a class="btn btn-primary btn-sm mt-3 internal" href="./" data-np-resume-link data-no-popover="true">Resume reading</a>
 </div>
 </div>
 </div>
 
-**Status legend:** Seedling (rough draft) · Growing (in progress) · Evergreen (reviewed and solid)
+## Bookshelf
+
+<ul class="nav nav-pills lib-filter mb-3" role="tablist" aria-label="Filter the shelf">
+<li class="nav-item"><button type="button" class="nav-link active" data-np-filter="all">All</button></li>
+<li class="nav-item"><button type="button" class="nav-link" data-np-filter="reading">Reading</button></li>
+<li class="nav-item"><button type="button" class="nav-link" data-np-filter="new">Not started</button></li>
+<li class="nav-item"><button type="button" class="nav-link" data-np-filter="done">Finished</button></li>
+</ul>
+<div class="row row-cols-2 row-cols-md-3 gx-4 gy-0 mb-4 lib-shelf">
+<div class="col lib-slot">
+<div class="card h-100 nb-card lib-book" data-np-notebook="html-notebook/">
+<a class="internal nb-cover" href="./html-notebook/" data-no-popover="true" title="Structure, semantics, forms, accessibility, SEO, dialog and popover" aria-label="Open the HTML notebook">
+<span class="nb-rings" aria-hidden="true"></span>
+<span class="nb-title">HTML</span>
+<span class="nb-sub">Notebook</span>
+<span class="nb-strip">Property of Yashwanth Pandi</span>
+</a>
+<div class="lib-plank" aria-hidden="true"></div>
+<div class="card-body nb-card-body">
+<div class="progress" role="progressbar" aria-label="HTML progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 4px"><div class="progress-bar" style="width: 0%"></div></div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-1 mt-2 small">
+<span class="text-body-secondary"><span class="np-pct">0%</span> · <span class="np-done">0</span>/<span class="np-count">0</span></span>
+<a class="internal np-go" href="./html-notebook/" data-np-continue>Start reading</a>
+</div>
+</div>
+</div>
+</div>
+<div class="col lib-slot">
+<div class="card h-100 nb-card lib-book" data-np-notebook="css3-notebook/">
+<a class="internal nb-cover" href="./css3-notebook/" data-no-popover="true" title="Selectors, box model, Flexbox, Grid, responsive design, animations" aria-label="Open the CSS3 notebook">
+<span class="nb-rings" aria-hidden="true"></span>
+<span class="nb-title">CSS3</span>
+<span class="nb-sub">Notebook</span>
+<span class="nb-strip">Property of Yashwanth Pandi</span>
+</a>
+<div class="lib-plank" aria-hidden="true"></div>
+<div class="card-body nb-card-body">
+<div class="progress" role="progressbar" aria-label="CSS3 progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 4px"><div class="progress-bar" style="width: 0%"></div></div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-1 mt-2 small">
+<span class="text-body-secondary"><span class="np-pct">0%</span> · <span class="np-done">0</span>/<span class="np-count">0</span></span>
+<a class="internal np-go" href="./css3-notebook/" data-np-continue>Start reading</a>
+</div>
+</div>
+</div>
+</div>
+<div class="col lib-slot">
+<div class="card h-100 nb-card lib-book" data-np-notebook="javascript-notebook/">
+<a class="internal nb-cover" href="./javascript-notebook/" data-no-popover="true" title="Core language, DOM, events, closures, async, fetch" aria-label="Open the JavaScript notebook">
+<span class="nb-rings" aria-hidden="true"></span>
+<span class="nb-title nb-long">JavaScript</span>
+<span class="nb-sub">Notebook</span>
+<span class="nb-strip">Property of Yashwanth Pandi</span>
+</a>
+<div class="lib-plank" aria-hidden="true"></div>
+<div class="card-body nb-card-body">
+<div class="progress" role="progressbar" aria-label="JavaScript progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 4px"><div class="progress-bar" style="width: 0%"></div></div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-1 mt-2 small">
+<span class="text-body-secondary"><span class="np-pct">0%</span> · <span class="np-done">0</span>/<span class="np-count">0</span></span>
+<a class="internal np-go" href="./javascript-notebook/" data-np-continue>Start reading</a>
+</div>
+</div>
+</div>
+</div>
+<div class="col lib-slot">
+<div class="card h-100 nb-card lib-book" data-np-notebook="typescript-notebook/">
+<a class="internal nb-cover" href="./typescript-notebook/" data-no-popover="true" title="Types, narrowing, generics, utility types, OOP, modules" aria-label="Open the TypeScript notebook">
+<span class="nb-rings" aria-hidden="true"></span>
+<span class="nb-title nb-long">TypeScript</span>
+<span class="nb-sub">Notebook</span>
+<span class="nb-strip">Property of Yashwanth Pandi</span>
+</a>
+<div class="lib-plank" aria-hidden="true"></div>
+<div class="card-body nb-card-body">
+<div class="progress" role="progressbar" aria-label="TypeScript progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 4px"><div class="progress-bar" style="width: 0%"></div></div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-1 mt-2 small">
+<span class="text-body-secondary"><span class="np-pct">0%</span> · <span class="np-done">0</span>/<span class="np-count">0</span></span>
+<a class="internal np-go" href="./typescript-notebook/" data-np-continue>Start reading</a>
+</div>
+</div>
+</div>
+</div>
+<div class="col lib-slot">
+<div class="card h-100 nb-card lib-book" data-np-notebook="angular-notebook/">
+<a class="internal nb-cover" href="./angular-notebook/" data-no-popover="true" title="Components, templates, services, DI, routing, RxJS" aria-label="Open the Angular notebook">
+<span class="nb-rings" aria-hidden="true"></span>
+<span class="nb-title">Angular</span>
+<span class="nb-sub">Notebook</span>
+<span class="nb-strip">Property of Yashwanth Pandi</span>
+</a>
+<div class="lib-plank" aria-hidden="true"></div>
+<div class="card-body nb-card-body">
+<div class="progress" role="progressbar" aria-label="Angular progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="height: 4px"><div class="progress-bar" style="width: 0%"></div></div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-1 mt-2 small">
+<span class="text-body-secondary"><span class="np-pct">0%</span> · <span class="np-done">0</span>/<span class="np-count">0</span></span>
+<a class="internal np-go" href="./angular-notebook/" data-np-continue>Start reading</a>
+</div>
+</div>
+</div>
+</div>
+<div class="col lib-slot lib-slot-ghost">
+<div class="card h-100 nb-card lib-book">
+<div class="nb-ghost"><span>Testing</span><small>coming soon</small></div>
+<div class="lib-plank" aria-hidden="true"></div>
+<div class="card-body nb-card-body small text-body-secondary">Next on the shelf</div>
+</div>
+</div>
+</div>
 
 ## How to use these notes
 

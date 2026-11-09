@@ -203,6 +203,163 @@ function afterDOM(css) {
     })
   }
 
+  // ---- last read (Kindle-style "Continue reading") -----------------------
+  // { slug, title, pos (0..1 scroll position), at } of the last chapter opened.
+  var LAST = "notebook-last"
+  function loadLast() {
+    try {
+      var v = JSON.parse(localStorage.getItem(LAST) || "null")
+      if (v && v.slug) return v
+    } catch (e) {}
+    return null
+  }
+  function saveLast(v) {
+    try {
+      localStorage.setItem(LAST, JSON.stringify(v))
+    } catch (e) {}
+  }
+  function chapterTitle() {
+    var t = document.querySelector(".center .article-title, .center h1")
+    return ((t ? t.textContent : document.title) || "").replace(/^\s*\d+[\s.\-]+/, "").trim()
+  }
+  var posTimer = null
+  window.addEventListener(
+    "scroll",
+    function () {
+      var last = loadLast()
+      var slug = document.body.dataset.slug || ""
+      if (!last || last.slug !== slug) return
+      clearTimeout(posTimer)
+      posTimer = setTimeout(function () {
+        var max = document.documentElement.scrollHeight - window.innerHeight
+        last.pos = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0
+        last.at = Date.now()
+        saveLast(last)
+      }, 300)
+    },
+    { passive: true },
+  )
+  function rememberChapter(slug) {
+    var last = loadLast()
+    var resume = null
+    try {
+      resume = sessionStorage.getItem("np-resume")
+      sessionStorage.removeItem("np-resume")
+    } catch (e) {}
+    if (resume === slug && last && last.slug === slug && last.pos > 0.02) {
+      // came from "Continue reading": go back to where the reader stopped
+      var pos = last.pos
+      setTimeout(function () {
+        var max = document.documentElement.scrollHeight - window.innerHeight
+        window.scrollTo(0, pos * max)
+      }, 60)
+    }
+    if (!last || last.slug !== slug) last = { slug: slug, pos: 0 }
+    last.title = chapterTitle()
+    last.at = Date.now()
+    saveLast(last)
+  }
+
+  function cover(name) {
+    return (
+      '<span class="nb-cover nb-cover-static" aria-hidden="true"><span class="nb-rings"></span>' +
+      '<span class="nb-title' +
+      (name.length > 7 ? " nb-long" : "") +
+      '">' +
+      name +
+      '</span><span class="nb-sub">Notebook</span><span class="nb-strip">Property of Yashwanth Pandi</span></span>'
+    )
+  }
+
+  function fillResume(all, doneSet) {
+    var box = document.querySelector("[data-np-resume]")
+    if (!box) return
+    var last = loadLast()
+    if (!last || all.indexOf(last.slug) < 0) {
+      box.classList.add("d-none")
+      return
+    }
+    var nb = (last.slug.match(/^[^/]+-notebook\//) || [""])[0]
+    var ns = stats(all, nb, doneSet)
+    var list = all.filter(function (s) {
+      return s.indexOf(nb) === 0
+    })
+    var at = list.indexOf(last.slug) + 1
+    var pct = Math.round((last.pos || 0) * 100)
+    box.querySelector("[data-np-resume-cover]").innerHTML = cover(notebookName(nb))
+    box.querySelector(".np-resume-title").textContent = last.title || last.slug
+    box.querySelector(".np-resume-meta").textContent =
+      notebookName(nb) + " · chapter " + at + " of " + list.length + " · " + pct + "% through"
+    var bar = box.querySelector(".progress-bar")
+    bar.style.width = pct + "%"
+    box.querySelector(".progress").setAttribute("aria-valuenow", pct)
+    var link = box.querySelector("a[data-np-resume-link]")
+    link.setAttribute("href", "/" + last.slug)
+    if (!link.__npBound) {
+      link.__npBound = true
+      link.addEventListener("click", function () {
+        try {
+          sessionStorage.setItem("np-resume", (loadLast() || {}).slug || "")
+        } catch (e) {}
+      })
+    }
+    box.querySelector(".np-resume-nb").textContent = ns.pct + "% of the notebook done"
+    box.classList.remove("d-none")
+  }
+
+  // Bookshelf tabs on the home page: All / Reading / Not started / Finished.
+  // The chosen tab is remembered in this browser only.
+  function shelfFilter(choice) {
+    var tabs = document.querySelectorAll("[data-np-filter]")
+    if (!tabs.length) return
+    var f = choice
+    if (!f) {
+      try {
+        f = localStorage.getItem("np-shelf") || "all"
+      } catch (e) {
+        f = "all"
+      }
+    } else {
+      try {
+        localStorage.setItem("np-shelf", f)
+      } catch (e) {}
+    }
+    tabs.forEach(function (t) {
+      var on = t.getAttribute("data-np-filter") === f
+      t.classList.toggle("active", on)
+      t.setAttribute("aria-pressed", on ? "true" : "false")
+      if (!t.__npBound) {
+        t.__npBound = true
+        t.addEventListener("click", function () {
+          shelfFilter(t.getAttribute("data-np-filter"))
+        })
+      }
+    })
+    var shown = 0
+    document.querySelectorAll(".lib-slot[data-np-state]").forEach(function (slot) {
+      var show = f === "all" || slot.getAttribute("data-np-state") === f
+      slot.classList.toggle("d-none", !show)
+      if (show) shown++
+    })
+    document.querySelectorAll(".lib-slot-ghost").forEach(function (g) {
+      g.classList.toggle("d-none", f !== "all")
+    })
+    var empty = document.querySelector(".lib-empty")
+    if (!empty) {
+      var shelf = document.querySelector(".lib-shelf")
+      if (shelf) {
+        empty = document.createElement("p")
+        empty.className = "lib-empty text-body-secondary small d-none"
+        shelf.parentNode.insertBefore(empty, shelf.nextSibling)
+      }
+    }
+    if (empty) {
+      empty.textContent =
+        f === "done" ? "No finished notebooks yet." : f === "reading" ? "Nothing in progress yet. Open a notebook to start." : "Every notebook has been started."
+      empty.classList.toggle("d-none", shown > 0)
+    }
+  }
+
   function render() {
     var host = document.querySelector(".np")
     if (!host) return
@@ -231,6 +388,7 @@ function afterDOM(css) {
 
     if (nb && !isIndex) {
       // Chapter page: completion switch + notebook progress.
+      rememberChapter(slug)
       var ns = stats(all, nb, doneSet)
       var done = !!doneSet[slug]
       var card = el(
@@ -301,9 +459,20 @@ function afterDOM(css) {
       root.appendChild(box)
     } else if (slug === "index") {
       // Home page: fill the notebook cards and the overall card.
+      var finished = 0
       document.querySelectorAll("[data-np-notebook]").forEach(function (card) {
-        fill(card, stats(all, card.getAttribute("data-np-notebook"), doneSet))
+        var st = stats(all, card.getAttribute("data-np-notebook"), doneSet)
+        fill(card, st)
+        var shelfState = st.done === 0 ? "new" : st.done === st.total ? "done" : "reading"
+        if (shelfState === "done") finished++
+        var slot = card.closest(".lib-slot") || card
+        slot.setAttribute("data-np-state", shelfState)
       })
+      document.querySelectorAll(".np-books-done").forEach(function (e) {
+        e.textContent = finished
+      })
+      shelfFilter()
+      fillResume(all, doneSet)
       document.querySelectorAll("[data-np-overall]").forEach(function (card) {
         fill(card, stats(all, "", doneSet))
       })
@@ -330,6 +499,8 @@ body[data-slug*="-notebook/"] .page-listing { display: none !important; }
 /* ticks next to links to finished chapters */
 .center article a.internal.np-done-link::after { content: " ✓"; color: var(--bs-success); font-weight: 700; }
 .center article a.btn.np-done-link::after { color: inherit; }
+.center article a.np-go.np-done-link::after,
+.center article a[data-np-resume-link].np-done-link::after { content: none; }
 `
 
 export const NotebookProgress = () => {
