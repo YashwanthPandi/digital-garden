@@ -1,0 +1,55 @@
+{
+  "name": "explorer",
+  "version": "1.0.0-local",
+  "private": true,
+  "description": "Local wrapper around @quartz-community/explorer: inside a notebook, the tree shows only that notebook.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "quartz": {
+    "name": "explorer",
+    "displayName": "Explorer (local)",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {
+      "folderDefaultState": "collapsed",
+      "folderClickBehavior": "link",
+      "useSavedState": true
+    },
+    "components": {
+      "Explorer": {
+        "displayName": "Explorer",
+        "defaultPosition": "left",
+        "defaultPriority": 50
+      }
+    },
+    "optionSchema": {
+      "title": {
+        "type": "string"
+      },
+      "folderDefaultState": {
+        "type": "enum",
+        "values": ["collapsed", "open"]
+      },
+      "folderClickBehavior": {
+        "type": "enum",
+        "values": ["collapse", "link"]
+      },
+      "useSavedState": {
+        "type": "boolean"
+      }
+    }
+  }
+}

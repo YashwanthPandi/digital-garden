@@ -157,7 +157,8 @@ plugins:
     enabled: true
   - source: "@quartz-community/tag-page"
     enabled: true
-  - source: "@quartz-community/explorer"
+  # Local wrapper (plugins/explorer): inside a notebook, show only that notebook's tree
+  - source: ./plugins/explorer
     enabled: true
     layout:
       position: left
@@ -186,11 +187,13 @@ plugins:
     layout:
       position: beforeBody
       priority: 10
+      condition: not-index
   - source: "@quartz-community/content-meta"
     enabled: true
     layout:
       position: beforeBody
       priority: 20
+      condition: not-index
   - source: "@quartz-community/tag-list"
     enabled: false
     layout:
@@ -216,6 +219,17 @@ plugins:
       position: left
       priority: 35
       group: toolbar
+  # Local plugin (plugins/bootstrap-ui): Bootstrap 5 for the whole site, tied to the theme
+  - source: ./plugins/bootstrap-ui
+    enabled: true
+    order: 95
+  # Local plugin (plugins/notebook-progress): "Mark as complete" on chapters and
+  # progress bars, synced per IP by functions/api/progress.js (Cloudflare KV)
+  - source: ./plugins/notebook-progress
+    enabled: true
+    layout:
+      position: afterBody
+      priority: 5
   - source: "@quartz-community/breadcrumbs"
     enabled: true
     layout:

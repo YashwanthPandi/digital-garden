@@ -1,0 +1,25 @@
+{
+  "name": "bootstrap-ui",
+  "version": "1.0.0-local",
+  "private": true,
+  "description": "Bootstrap 5 styling for the whole site, tied to the Quartz theme colours and dark mode.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "quartz": {
+    "name": "bootstrap-ui",
+    "displayName": "Bootstrap UI (local)",
+    "category": "transformer",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 95,
+    "defaultEnabled": true,
+    "defaultOptions": {}
+  }
+}

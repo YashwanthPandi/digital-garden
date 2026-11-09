@@ -1,0 +1,35 @@
+{
+  "name": "notebook-progress",
+  "version": "1.0.0-local",
+  "private": true,
+  "description": "Mark notebook chapters complete and show progress, synced per IP address.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "quartz": {
+    "name": "notebook-progress",
+    "displayName": "Notebook Progress (local)",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 50,
+    "defaultEnabled": true,
+    "defaultOptions": {},
+    "components": {
+      "NotebookProgress": {
+        "displayName": "Notebook Progress",
+        "defaultPosition": "afterBody",
+        "defaultPriority": 5
+      }
+    }
+  }
+}
